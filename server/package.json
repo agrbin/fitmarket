@@ -1,0 +1,15 @@
+{
+  "name": "fitmarket",
+  "version": "0.0.1",
+  "description": "A stock-exchange-like online game.",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/agrbin/fitmarket.git"
+  },
+  "readme": "../README.md",
+  "dependencies": {
+    "async": "^2.1.4",
+    "express": "^4.14.0",
+    "passport-google-oauth": "^1.0.0"
+  }
+}
