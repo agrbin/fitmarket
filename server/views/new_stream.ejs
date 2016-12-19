@@ -1,0 +1,26 @@
+<h1>new data stream callback</h1>
+
+<br/>
+
+<% if (!has_google || !has_fitbit) { %>
+  <p>In order to add your stream, login with both google and fitbit.</p>
+<% } %>
+
+<% if (!has_google) { %>
+  <a href="/google/init/">login with google</a><br/>
+<% } %>
+
+<% if (!has_fitbit) { %>
+  <a href="/fitbit/init/">login with fitbit</a><br/>
+<% } %>
+
+<% if (has_google && has_fitbit) { %>
+  <form action="/new_stream/submit" method="post">
+    <label>
+      Give a nickname to your dataset:
+      <input type="text" name="name" />
+    </label>
+    <input type="submit" value="submit" />
+  </form>
+<% } %>
+
