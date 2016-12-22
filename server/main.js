@@ -9,7 +9,6 @@ var express = require("express"),
   ensureLoggedIn = require("connect-ensure-login").ensureLoggedIn,
   ensureLoggedOut = require("connect-ensure-login").ensureLoggedOut,
   config = require("../common/config.js"),
-  db = new require("../common/db.js").Db(),
   new_stream = require("./new_stream.js"),
   lastLine = null;
 
