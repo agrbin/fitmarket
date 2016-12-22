@@ -14,7 +14,7 @@ var metricHeader = { "Accept-Language" : "fr_FR" };
 // Takes a stream_credentials row, downloads the stream data from fitbit and
 // writes it into the database.
 function saveStreamData(stream, done) {
-  console.log("Processing stream " + stream.name);
+  console.log("Processing stream " + stream.stream_name);
 
   function getWeightsForDateRange(date_range, done) {
     fitbitClient.get(
@@ -43,7 +43,7 @@ function saveStreamData(stream, done) {
   async.waterfall([
     // Read the latest reading from the database.
     function (done) {
-      db.getLatestMeasurement(stream.user_id, done);
+      db.getLatestMeasurement(stream.stream_id, done);
     },
     // Construct date ranges in increment of 30 days.
     function (date_from_str, done) {
@@ -96,7 +96,8 @@ function saveStreamData(stream, done) {
       done(null, aggregatedReadings);
     // Write readings into the database.
     }, function (readings_arr, done) {
-      db.writeDataPoints(stream.name, stream.user_id, readings_arr, done);
+      db.writeDataPoints(
+          stream.stream_id, stream.stream_name, readings_arr, done);
     },
     function (done) {
       console.log("  New readings written to db.");
@@ -118,13 +119,14 @@ db.getStreamCredentials(function (err, stream) {
       return console.log("failed to refresh token", err);
     }
     db.updateAccessToken(
-      stream.user_id,
+      stream.stream_id,
       token.access_token,
       token.refresh_token, function (err, done) {
         if (err) {
           console.log("failed to update access token: ", err);
         } else {
-          console.log("  New access/refresh token written for ", stream.name);
+          console.log("  New access/refresh token written for ",
+            stream.stream_name);
         }
       });
     stream.access_token = token.access_token;
