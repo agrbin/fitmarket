@@ -14,10 +14,19 @@ module.exports.Db = function () {
     db.exec(sql, done);
   };
 
+  // ------------------- stream handling
+  
+  this.getDataPointsForPlot = function (cb, done) {
+    db.each("SELECT stream_name, date, weight " +
+            "FROM stream_data " + 
+            "ORDER BY date, stream_name",
+            cb, done);
+  };
+
   // Callback is called with each stream_credentials row in the db.
-  this.getStreamCredentials = function(cb) {
+  this.getStreamCredentials = function(cb, done) {
     db.each("SELECT stream_id, stream_name, access_token, refresh_token " +
-            "FROM stream_credentials", cb);
+            "FROM stream_credentials", cb, done);
   };
 
   this.writeDataPoints = function (stream_id, stream_name,

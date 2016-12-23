@@ -23,6 +23,8 @@ module.exports = {
     resave: false,
     saveUninitialized: false
   },
+
+  plot_txt : "../data/plot.txt",
 };
 
 // in override file, do something like:
