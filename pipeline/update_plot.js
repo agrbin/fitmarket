@@ -32,14 +32,12 @@ module.exports.updatePlot = function(done) {
     }
     write_stream.write("date,");
     write_stream.write(columns.join(","));
-    write_stream.write(",\n");
+    write_stream.write("\n");
     for (var date in per_date) {
       write_stream.write(date + ",");
-      for (var i = 0; i < columns.length; ++i) {
-        var weight = per_date[date][columns[i]];
-        write_stream.write(JSON.stringify(weight));
-        write_stream.write(",");
-      }
+      write_stream.write(columns.map(function (column) {
+          return JSON.stringify(per_date[date][column]);
+        }).join(","));
       write_stream.write("\n");
     }
     write_stream.end();

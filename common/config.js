@@ -25,6 +25,15 @@ module.exports = {
   },
 
   plot_txt : "../data/plot.txt",
+
+  initial_user_tmpl : {
+    user_name : "changeme",
+    free_money : 100000,
+    total_money : 100000,
+    shares : "[]",
+  },
+
+  maxWeight : 150,
 };
 
 // in override file, do something like:

@@ -1,0 +1,73 @@
+<% if (user.user_name == "changeme") { %>
+
+<div class="ui-body ui-body-a">
+  <form action="/main/personal/update" method="post">
+    <label for="presonal_user_name">Change your name:</label>
+    <input
+      type="text"
+      name="personal_user_name"
+      id="text-basic"
+      value="<%= user.user_name %>">
+    <input type="submit" value="Change">
+  </form>
+</div>
+
+<% } %>
+
+<div class="ui-corner-all">
+  <div class="ui-bar ui-bar-a">
+    <h3>Moje stanje (<%= user.user_name%>)</h3>
+  </div>
+  <div class="ui-body ui-body-a">
+    <table data-role="table" class="table-stroke ui-responsive" id="details">
+      <thead>
+        <tr><td></td><td></td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Ukpuna vrijednost</th>
+          <td><span class="value"><%= user.total_money %></span></td>
+        </tr>
+        <tr>
+          <th>Neinvestirano</th>
+          <td><span class="value"><%= user.free_money %></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="ui-corner-all">
+  <div class="ui-bar ui-bar-a">
+    <h3>Buy buy buy</h3>
+  </div>
+  <div class="ui-body ui-body-a">
+
+    <!-- TODO: tu ide kupi ili prodaj -->
+    <form action="/main/personal/submit" method="post">
+
+        <!-- TODO trenutna cijena! -->
+        <label for="stream" class="select">Odaberi dionicu</label>
+        <select name="stream" id="stream">
+            <option value=""></option>
+            <option value="kilfa">kifla</option>
+            <option value="luka">luka</option>
+        </select>
+
+        <fieldset data-role="controlgroup">
+            <legend>Kupujes ili prodajes?Za inverznu dionicu ~x vrijedi: vrijednost(~x) = 150 - vrijednost(x)</legend>
+            <input type="checkbox" name="checkbox-inverted" id="checkbox-inverted" checked="">
+            <label for="checkbox-inverted">Inverzna</label>
+        </fieldset>
+
+        <label for="slider-fill">Broj dionica:</label>
+        <input type="range" name="slider-fill" id="slider-fill" value="60" min="0" max="100" step="1" data-highlight="true">
+
+        <!-- TODO total cost -->
+        <input type="submit" value="Submit">
+    </form>
+
+    <%- JSON.stringify(actual,2) %>
+
+  </div>
+</div>

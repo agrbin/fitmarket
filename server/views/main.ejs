@@ -1,2 +1,29 @@
-hello world! <%= session %>
+<%- include _head.ejs %>
 
+<script>
+  var js_payload = <%- js_payload %>;
+  for (var key in js_payload) {
+    for (var i = 0; i < js_payload[key].length; ++i) {
+      console.log(key + ":", js_payload[key][i]);
+    }
+  }
+</script>
+
+<div data-role="page" id="market">
+  <%- include page_market.ejs %>
+</div>
+
+<div data-role="page" id="personal">
+  <%- include page_personal.ejs %>
+</div>
+
+<div data-role="footer" data-position="fixed" data-theme="a">
+  <div data-role="navbar">
+    <ul>
+      <li><a href="#market" class="market">Market</a></li>
+      <li><a href="#personal" class="personal">Kupi/prodaj</a></li>
+    </ul>
+  </div>
+</div>
+
+<%- include _foot.ejs %>

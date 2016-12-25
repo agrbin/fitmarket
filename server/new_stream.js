@@ -18,6 +18,8 @@ module.exports.submit = function (req, res) {
     return res.redirect("/new_stream");
   }
   db.addNewStream(
+    // TODO hash this ID. stream_id shouldn't point to the google user. we will
+    // share stream_id with the browser.
     req.session.google,
     req.body.name,
     req.session.fitbit.fitbit_id,

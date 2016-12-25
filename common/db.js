@@ -14,8 +14,94 @@ module.exports.Db = function () {
     db.exec(sql, done);
   };
 
+  // ------------------- user handling
+
+  this.updateUser = function (user_id, user_name, done) {
+    db.run("UPDATE user SET user_name = ? " +
+           "WHERE user_id = ?", user_name, user_id, done); 
+  };
+
+  function deserializeShares(user) {
+    try {
+      user.shares = JSON.parse(user.shares);
+    } catch (exp) {
+      console.log("while deserializing shares: ", exp);
+      user.shares = [];
+    }
+  }
+
+  function createInitialUser(user_id, done) {
+    var tmpl = JSON.parse(JSON.stringify(config.initial_user_tmpl));
+    tmpl.user_id = user_id;
+    db.run("INSERT INTO user " +
+           "(user_id, user_name, " +
+              "free_money, total_money, shares)   " +
+           "VALUES (?, ?, ?, ?, ?)",
+           tmpl.user_id,
+           tmpl.user_name,
+           tmpl.free_money,
+           tmpl.total_money,
+           tmpl.shares,
+           function (err) { done(err, tmpl); });
+  }
+
+  // Returns the user's row. Initializes the user if row is still not there.
+  this.getUser = function (user_id, done) {
+    db.get("SELECT user_id, user_name, free_money, total_money, shares " +
+           "FROM user " +
+           "WHERE user_id = ?", user_id, function (err, row) {
+      if (err) {
+        return done(err);
+      }
+      if (!row) {
+        createInitialUser(user_id, done);
+      } else {
+        done(null, row);
+      }
+    });
+  };
+
   // ------------------- stream handling
-  
+
+  this.getLatestWeights = function (done) {
+    var actual = {};
+    db.each(" \
+      SELECT stream_id, stream_name, latest_weight \
+      FROM stream_credentials",
+      function (err, row) {
+        if (err) return done(err);
+        if (row.latest_weight > 0) {
+          actual[row.stream_id] = {
+            stream_id : row.stream_id,
+            stream_name : row.stream_name,
+            latest_weight : row.latest_weight,
+          }
+          var inv_id = "~" + row.stream_id;
+          actual[inv_id] = {
+            stream_id : inv_id,
+            stream_name : "~" + row.stream_name,
+            latest_weight : config.maxWeight - row.latest_weight,
+          }
+        }
+      },
+      function (err) {
+        if (err) return done(err);
+        done(null, actual);
+      });
+  };
+
+  this.updateLatestWeight = function (done) {
+    var sql = " \
+      UPDATE stream_credentials SET latest_weight = ( \
+        SELECT weight FROM stream_data sd1 \
+        WHERE sd1.date = ( \
+          SELECT MAX(sd2.date) \
+            FROM stream_data sd2 \
+            WHERE sd1.stream_id = sd2.stream_id) \
+      )";
+    db.run(sql, done);
+  };
+
   this.getDataPointsForPlot = function (cb, done) {
     db.each("SELECT stream_name, date, weight " +
             "FROM stream_data " + 

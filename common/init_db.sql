@@ -17,6 +17,7 @@
  * 'shares' (FW) is a JSON encoded object that encodes user's shares in possesion.
  *    {TEXT "stream_id" => INT "count"},
  */
+DROP TABLE IF EXISTS user;
 CREATE TABLE user (
   user_id TEXT,
   user_name TEXT,
@@ -30,6 +31,7 @@ CREATE TABLE user (
  *
  * 'stream_id' is google user_id of the user who owns the stream.
  * 'stream_name' is a stream nickname used in frontend.
+ * 'latest_weight' (BW), the latest weight info, can be null.
  */
 DROP TABLE IF EXISTS stream_credentials;
 CREATE TABLE stream_credentials (
@@ -37,7 +39,8 @@ CREATE TABLE stream_credentials (
   stream_name TEXT,
   fitbit_user_id TEXT,
   access_token TEXT,
-  refresh_token TEXT
+  refresh_token TEXT,
+  latest_weight DOUBLE
 );
 
 /*
@@ -67,6 +70,7 @@ CREATE TABLE stream_data (
  * 'action' is "SELL" or "BUY". See db.SELL and db.BUY.
  * '_name' is denormalized here for easier log reading.
  */
+DROP TABLE IF EXISTS transaction_log;
 CREATE TABLE transaction_log (
   datetime TEXT,
   user_id TEXT,

@@ -6,12 +6,14 @@ var
   moment = require("moment"),
   async = require("async"),
   update_plot = require("./update_plot.js"),
+  update_latest = require("./update_latest.js"),
   get_readings = require("./get_readings.js");
 
 async.series(
   [
     get_readings.getReadings,
     update_plot.updatePlot,
+    update_latest.updateLatest,
   ],
   function (err) {
     if (err) {
