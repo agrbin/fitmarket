@@ -1,0 +1,7 @@
+<%
+
+formatValue = function (x) {
+  return Math.round(x * 10) / 10;
+};
+
+%>

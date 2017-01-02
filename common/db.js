@@ -1,34 +1,100 @@
 var sqlite3 = require("sqlite3").verbose(),
+  TransactionDatabase = require("sqlite3-transactions").TransactionDatabase,
   config = require("../common/config.js"),
   fs = require("fs"),
   moment = require("moment");
 
 module.exports.Db = function () {
-  var db = new sqlite3.Database(config.db);
-
-  this.SELL = "SELL";
-  this.BUY = "BUY";
+  var db = new TransactionDatabase(new sqlite3.Database(config.db));
 
   this.initializeDb = function (done) {
     var sql = fs.readFileSync("../common/init_db.sql", "utf8");
     db.exec(sql, done);
   };
 
+  // ------------------- transactions
+
+  this.applyTransaction = function(t, done) {
+    var sql_user = '                                 \
+        UPDATE "user" SET                            \
+          free_money = $new_free_money,              \
+          shares = $new_shares                       \
+        WHERE user_id = $user_id                     ';
+    var vars_user = {
+      $user_id: t.user_id,
+      $new_shares: JSON.stringify(t.new_shares),
+      $new_free_money: t.new_free_money,
+    };
+
+    var sql_log = '                                    \
+          INSERT INTO transaction_log (                \
+            datetime, user_id, user_name,              \
+            stream_id, stream_name, stream_weight,     \
+            action, count                              \
+            )                                          \
+          VALUES (                                     \
+            $datetime, $user_id, $user_name,           \
+            $stream_id, $stream_name, $stream_weight,  \
+            $action, $count                            \
+            );                                         ';
+    var vars_log = {
+      $datetime: t.datetime,
+      $action: t.action,
+      $stream_id: t.stream_id,
+      $count: t.count,
+      $stream_name: t.stream_name,
+      $stream_weight: t.stream_weight,
+      $user_id: t.user_id,
+      $user_name: t.user_name,
+    };
+
+    // TODO, can this be less entangled??
+    db.beginTransaction(function (err, transaction) {
+      if (err) {
+        return done(err);
+      }
+      transaction.run(sql_user, vars_user,
+        function (err) {
+          if (err) {
+            transaction.rollback(function () {
+              done(err);
+            });
+          }
+          if (this.changes !== 1) {
+            transaction.rollback(function () {
+              done("didn't update user as expected.");
+            });
+          }
+          transaction.run(sql_log, vars_log,
+            function (err) {
+              if (err) {
+                transaction.rollback(function () {
+                  done(err);
+                });
+              } else {
+                transaction.commit(done);
+              }
+            });
+      });
+    });
+  };
+
   // ------------------- user handling
+
+  this.getTopTraders = function (done) {
+    db.all(' \
+        SELECT user_name, total_money \
+        FROM "user" \
+        ORDER BY total_money DESC \
+        LIMIT 8; \
+        ',
+        done);
+  };
 
   this.updateUser = function (user_id, user_name, done) {
     db.run("UPDATE user SET user_name = ? " +
            "WHERE user_id = ?", user_name, user_id, done); 
   };
-
-  function deserializeShares(user) {
-    try {
-      user.shares = JSON.parse(user.shares);
-    } catch (exp) {
-      console.log("while deserializing shares: ", exp);
-      user.shares = [];
-    }
-  }
 
   function createInitialUser(user_id, done) {
     var tmpl = JSON.parse(JSON.stringify(config.initial_user_tmpl));

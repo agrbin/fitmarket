@@ -1,3 +1,39 @@
-body {
-  background-color: #eee;
+span.value:after {
+  content: " kg";
+  color: gray;
 }
+
+tr.in_update_buy {
+  background-color: #ebffeb;
+}
+
+tr.in_update_sell {
+  background-color: #ffebeb;
+}
+
+/* hack, this removes columns button everywhere */
+.ui-table-columntoggle-btn {
+  display: none !important;
+}
+
+.my-center {
+  text-align: center;
+}
+
+table.table-stroke {
+  margin-bottom: 20px;
+}
+
+div.plot-container {
+  position: relative;
+  height: 300px;
+}
+
+div.plot {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  bottom: 10px;
+}
+

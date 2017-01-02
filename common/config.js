@@ -28,12 +28,14 @@ module.exports = {
 
   initial_user_tmpl : {
     user_name : "changeme",
-    free_money : 100000,
-    total_money : 100000,
-    shares : "[]",
+    free_money : 10000,
+    total_money : 10000,
+    shares : "{}",
   },
 
   maxWeight : 150,
+
+  enableSelfShares : true,
 };
 
 // in override file, do something like:

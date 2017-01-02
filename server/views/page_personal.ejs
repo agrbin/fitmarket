@@ -15,59 +15,81 @@
 <% } %>
 
 <div class="ui-corner-all">
-  <div class="ui-bar ui-bar-a">
-    <h3>Moje stanje (<%= user.user_name%>)</h3>
-  </div>
   <div class="ui-body ui-body-a">
-    <table data-role="table" class="table-stroke ui-responsive" id="details">
+    <table
+      data-role="table"
+      class="table-stroke ui-responsive"
+      data-mode="columntoggle"
+      id="details">
       <thead>
-        <tr><td></td><td></td></tr>
+        <tr>
+          <th data-priority="1"></th>
+          <th data-priority="2"></th>
+          <th data-priority="1"></th>
+        </tr>
       </thead>
       <tbody>
         <tr>
           <th>Ukpuna vrijednost</th>
-          <td><span class="value"><%= user.total_money %></span></td>
+          <td></td>
+          <td><span class="value"><%= formatValue(user.total_money) %></span></td>
         </tr>
-        <tr>
-          <th>Neinvestirano</th>
-          <td><span class="value"><%= user.free_money %></span></td>
+        <tr class="free_money">
+          <td>Neinvestirano</td>
+          <td></td>
+          <td><span class="value"><%= formatValue(user.free_money) %></span></td>
         </tr>
+
+        <% for (var stream_id in actual) { %>
+          <tr class="share_row" data-stream_id="<%= stream_id %>">
+            <td class="name"></td>
+            <td class="count">
+              <span class="value latest_weight"></span>
+              *
+              <span class="how_many"></span>
+            </td>
+            <td><span class="value total_value">
+            </span></td>
+          </tr>
+        <% } %>
       </tbody>
     </table>
   </div>
 </div>
 
 <div class="ui-corner-all">
-  <div class="ui-bar ui-bar-a">
-    <h3>Buy buy buy</h3>
+  <div class="ui-bar">
+    <div data-role="controlgroup" data-type="horizontal" class="my-center">
+      <a href="#" class="ui-btn show-sth show-buy">Kupi</a>
+      <a href="#" class="ui-btn show-sth show-sell">Prodaj</a>
+    </div>
   </div>
-  <div class="ui-body ui-body-a">
+  <div class="ui-body ui-body-a buy-sell-form">
 
-    <!-- TODO: tu ide kupi ili prodaj -->
     <form action="/main/personal/submit" method="post">
+      <input type="hidden" class="which_action" name="action" value="buy"/> 
 
-        <!-- TODO trenutna cijena! -->
-        <label for="stream" class="select">Odaberi dionicu</label>
-        <select name="stream" id="stream">
-            <option value=""></option>
-            <option value="kilfa">kifla</option>
-            <option value="luka">luka</option>
-        </select>
+      <select name="stream" class="select_stream">
+        <option value="" disabled selected>Odaberi dionicu</option>
+        <% for (var stream_id in actual) { %>
+          <option value="<%= stream_id %>">
+            <%= actual[stream_id].stream_name %>
+            (<%= actual[stream_id].latest_weight %> kg)
+          </option>
+        <% } %>
+      </select>
 
-        <fieldset data-role="controlgroup">
-            <legend>Kupujes ili prodajes?Za inverznu dionicu ~x vrijedi: vrijednost(~x) = 150 - vrijednost(x)</legend>
-            <input type="checkbox" name="checkbox-inverted" id="checkbox-inverted" checked="">
-            <label for="checkbox-inverted">Inverzna</label>
-        </fieldset>
 
-        <label for="slider-fill">Broj dionica:</label>
-        <input type="range" name="slider-fill" id="slider-fill" value="60" min="0" max="100" step="1" data-highlight="true">
+      <div class="slider-container">
+        <label for="count">Broj dionica:</label>
+        <input type="range" name="count" id="count"
+          value="1" min="1" max="100" step="1"
+          data-highlight="true">
 
-        <!-- TODO total cost -->
-        <input type="submit" value="Submit">
+        <input type="submit" value="Izvrši">
+      </div>
+
     </form>
-
-    <%- JSON.stringify(actual,2) %>
 
   </div>
 </div>

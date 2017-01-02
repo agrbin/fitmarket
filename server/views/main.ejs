@@ -1,8 +1,9 @@
 <%- include _head.ejs %>
+<%- include functions.ejs %> 
 
 <script>
   var js_payload = <%- js_payload %>;
-  for (var key in js_payload) {
+  for (var key in {error:0, info:0}) {
     for (var i = 0; i < js_payload[key].length; ++i) {
       console.log(key + ":", js_payload[key][i]);
     }

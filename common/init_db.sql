@@ -67,7 +67,7 @@ CREATE TABLE stream_data (
  * 'stream_weight'.
  * This table is a pure log table, we don't read from it from the application.
  *
- * 'action' is "SELL" or "BUY". See db.SELL and db.BUY.
+ * 'action' is "SELL" or "BUY".
  * '_name' is denormalized here for easier log reading.
  */
 DROP TABLE IF EXISTS transaction_log;
@@ -75,7 +75,7 @@ CREATE TABLE transaction_log (
   datetime TEXT,
   user_id TEXT,
   user_name TEXT,
-  stream_user_id TEXT,
+  stream_id TEXT,
   stream_name TEXT,
   stream_weight DOUBLE,
   action TEXT,

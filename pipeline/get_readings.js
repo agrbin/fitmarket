@@ -12,6 +12,10 @@ var fitbitClient = new FitbitApiClient(
 
 var metricHeader = { "Accept-Language" : "fr_FR" };
 
+function roundValue(x) {
+  return Math.round(x * 10) / 10;
+}
+
 // Takes a stream_credentials row, downloads the stream data from fitbit and
 // writes it into the database.
 function saveStreamData(stream, done) {
@@ -84,7 +88,7 @@ function saveStreamData(stream, done) {
           if (!readings.hasOwnProperty(reading.date)) {
             readings[reading.date] = [];
           }
-          readings[reading.date].push(reading.weight);
+          readings[reading.date].push(roundValue(reading.weight));
         }
       }
       var aggregatedReadings = [];

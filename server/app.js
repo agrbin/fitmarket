@@ -116,6 +116,12 @@ function getUserFromDb(req, res, next) {
       return res.error(err);
     }
     req.user = user;
+    try {
+      req.user.shares = JSON.parse(req.user.shares);
+    } catch (e) {
+      console.log("can't parse user shares: ", req.user, e);
+      req.user.shares = {};
+    }
     next();
   });
 }
@@ -140,6 +146,7 @@ var mainMid = [
 app.get("/main/plot_txt", mainMid, main.path_txt); 
 app.get("/main", mainMid, main.landing);
 app.post("/main/personal/update", mainMid, main.personalUpdate);
+app.post("/main/personal/submit", mainMid, main.submitTransaction);
 
 app.get("/new_stream", new_stream.landing);
 app.post("/new_stream/submit", new_stream.submit);
