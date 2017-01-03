@@ -1,5 +1,7 @@
 #/bin/bash
 
+# Note that crontab runs /srv/fitmarket/pipeline/run.sh every day at noon.
+
 set -e
 
 if [ $(hostname) != "vagrbin-dev" ]; then
@@ -24,4 +26,3 @@ cp -r $root/{server,pipeline,common,node_modules} \
 mkdir -p $target/data/
 cp $root/deploy/config.override.xfer.js $target/data/config.override.js
 
-# TODO: cron tab.
