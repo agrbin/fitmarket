@@ -83,29 +83,31 @@ module.exports.Db = function () {
     // 2. populate with data
     // 3. run update
     // 4. delete temp table
+    var timestamp = new Date().getTime();
     async.series([
       function (cb) {
-        db.exec("CREATE TEMP TABLE  " +
-                "assets (user_id TEXT, total_money DOUBLE);", cb);
+        db.run("DELETE FROM total_money_log " +
+                "WHERE timestamp = ?;",
+                timestamp, cb);
       },
       function (cb) {
         var stmt = db.prepare(
-            "INSERT INTO assets " +
-            "(user_id, total_money) " + 
-            "VALUES (?, ?);");
+            "INSERT INTO total_money_log " +
+            "(timestamp, user_id, total_money) " + 
+            "VALUES (?, ?, ?);");
         for (var i = 0; i < pairs.length; i++) {
-          stmt.run(pairs[i].user_id, pairs[i].total_money);
+          stmt.run(timestamp,
+            pairs[i].user_id,
+            pairs[i].total_money);
         }
         stmt.finalize(cb);
       },
       function (cb) {
         var sql = "UPDATE user SET total_money = ( " +
-            "SELECT total_money FROM assets a1 " +
-            "WHERE a1.user_id = user.user_id);";
-        db.run(sql, done);
-      },
-      function (cb) {
-        db.exec("DELETE TEMP TABLE assets;", cb);
+            "SELECT total_money FROM total_money_log a1 " +
+            "WHERE a1.user_id = user.user_id AND " +
+            "      timestamp = ?);";
+        db.run(sql, timestamp, done);
       },
     ], done);
   };
@@ -233,9 +235,9 @@ module.exports.Db = function () {
   };
 
   // Returns the date of the latest data-point for stream for 'user_id'. Falls
-  // back to now() - 1 year.
+  // back to now() - 2 years.
   this.getLatestMeasurement = function (stream_id, cb) {
-    var yearAgo = moment().subtract(365, "days");
+    var yearAgo = moment().subtract(2 * 365, "days");
     var fallback = yearAgo.format("YYYY-MM-DD");
 
     db.get("SELECT date FROM stream_data " +

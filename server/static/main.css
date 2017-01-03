@@ -37,3 +37,22 @@ div.plot {
   bottom: 10px;
 }
 
+div#plot-overlay {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  bottom: 10px;
+  z-index: 100;
+}
+
+.time-span-buttons a:first-child {
+  margin-left: 20px;
+}
+
+.time-span-buttons a {
+  margin: 0px;
+  margin-left: 10px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}

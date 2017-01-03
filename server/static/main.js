@@ -17,6 +17,7 @@ function formatValue(x) {
   return x.formatMoney(1, ".", ",");
 }
 
+// update table.
 function updateTable(additionalState) {
   var free_money_delta = 0;
   var user = js_payload.user;
@@ -68,6 +69,7 @@ function updateTable(additionalState) {
   }
 }
 
+// updating table when transaction is active
 function onSliderChange() {
   // NOTE, optimization idea: this state can obtained by different means.
   var slider = $("input#count");
@@ -82,6 +84,7 @@ function onSliderChange() {
   });
 }
 
+// buy/sell button events.
 function setUpBuySellButtons() {
   var user = js_payload.user;
   var user_shares = user.shares;
@@ -164,6 +167,7 @@ function setUpBuySellButtons() {
   }
 }
 
+// personal -> when stream is selected
 $(function () {
   $("div.slider-container").hide();
 
@@ -196,6 +200,7 @@ $(function () {
   });
 });
 
+// navigation between market and personal
 $(function () {
   // persistent toolbars:
   // demos.jquerymobile.com/1.4.5/toolbar-fixed-persistent/
@@ -223,11 +228,49 @@ $(function () {
         gridLineColor : "#ccc",
         legend: 'always',
         drawPoints: true,
+        drawCallback: setUpZoomButtons 
       });
     }
   }
 
   $(document).on("pagecontainerchange", applyBtnActive);
   applyBtnActive();
+
+  var originalRange = null;
+
+  // Stock time-range buttons.
+  function activate() {
+    $(".time-span-buttons a").removeClass("ui-btn-active");
+    $(this).addClass("ui-btn-active");
+    $(this).blur();
+    var span_str = $(this).text();
+    var span_ms = 0;
+    var now = new Date().getTime();
+    switch (span_str) {
+      case "1y":
+        span_ms = 365 * 24 * 3600 * 1000;
+        break;
+      case "1m":
+        span_ms = 30 * 24 * 3600 * 1000;
+        break;
+      case "1w":
+        span_ms = 7 * 24 * 3600 * 1000;
+        break;
+      default:
+        span_ms = originalRange[1] - originalRange[0];
+        break;
+    }
+    opt = {dateWindow: [now - span_ms, now]};
+    plot.updateOptions(opt);
+  }
+
+  function setUpZoomButtons() {
+    if (originalRange !== null) {
+      return;
+    }
+    originalRange = plot.xAxisRange();
+    $(".time-span-buttons a").click(activate);
+    activate.call($("a.initial")[0]);
+  }
 });
 

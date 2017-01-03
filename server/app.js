@@ -1,6 +1,7 @@
 var express = require("express"),
   passport = require("passport"),
   session = require("express-session"),
+  sha1 = require('sha1'),
   bodyParser = require("body-parser"),
   FitbitStrategy =
     require("passport-fitbit-oauth2").FitbitOAuth2Strategy,
@@ -33,7 +34,7 @@ function setUpAuth() {
   passport.use(new GoogleStrategy(
     config.google,
     function(accessToken, refreshToken, profile, cb) {
-      return cb(null, profile.id);
+      return cb(null, sha1(profile.id));
     }
   ));
 
@@ -68,7 +69,7 @@ function setUpAuth() {
     passport.authenticate("fitbit", {failureRedirect: "/"}),
     function (req, res) {
       req.session.fitbit = clone(req.session.passport.user);
-      res.redirect("/main");
+      res.redirect("/new_stream");
     }
   );
 }

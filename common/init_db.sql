@@ -82,3 +82,13 @@ CREATE TABLE transaction_log (
   count INT
 );
 
+/*
+ * 'user_id' had 'total_money' at time 'timestamp'.
+ */
+DROP TABLE IF EXISTS total_money_log;
+CREATE TABLE total_money_log (
+  timestamp INT,
+  user_id TEXT,
+  total_money DOUBLE
+);
+
