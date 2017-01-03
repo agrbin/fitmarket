@@ -2,16 +2,13 @@ var sqlite3 = require("sqlite3").verbose(),
   TransactionDatabase = require("sqlite3-transactions").TransactionDatabase,
   config = require("../common/config.js"),
   fs = require("fs"),
+  async = require("async"),
   moment = require("moment");
 
+// One connection per process.
+var db = new TransactionDatabase(new sqlite3.Database(config.db));
+
 module.exports.Db = function () {
-  var db = new TransactionDatabase(new sqlite3.Database(config.db));
-
-  this.initializeDb = function (done) {
-    var sql = fs.readFileSync("../common/init_db.sql", "utf8");
-    db.exec(sql, done);
-  };
-
   // ------------------- transactions
 
   this.applyTransaction = function(t, done) {
@@ -81,12 +78,52 @@ module.exports.Db = function () {
 
   // ------------------- user handling
 
+  this.updateTotalMoney = function (pairs, done) {
+    // 1. create temp table
+    // 2. populate with data
+    // 3. run update
+    // 4. delete temp table
+    async.series([
+      function (cb) {
+        db.exec("CREATE TEMP TABLE  " +
+                "assets (user_id TEXT, total_money DOUBLE);", cb);
+      },
+      function (cb) {
+        var stmt = db.prepare(
+            "INSERT INTO assets " +
+            "(user_id, total_money) " + 
+            "VALUES (?, ?);");
+        for (var i = 0; i < pairs.length; i++) {
+          stmt.run(pairs[i].user_id, pairs[i].total_money);
+        }
+        stmt.finalize(cb);
+      },
+      function (cb) {
+        var sql = "UPDATE user SET total_money = ( " +
+            "SELECT total_money FROM assets a1 " +
+            "WHERE a1.user_id = user.user_id);";
+        db.run(sql, done);
+      },
+      function (cb) {
+        db.exec("DELETE TEMP TABLE assets;", cb);
+      },
+    ], done);
+  };
+
   this.getTopTraders = function (done) {
     db.all(' \
         SELECT user_name, total_money \
         FROM "user" \
         ORDER BY total_money DESC \
         LIMIT 8; \
+        ',
+        done);
+  };
+
+  this.getAllUserAssets = function (done) {
+    db.all(' \
+        SELECT user_id, free_money, shares \
+        FROM "user" \
         ',
         done);
   };
@@ -242,6 +279,13 @@ module.exports.Db = function () {
            access_token,
            refresh_token,
            done);
+  };
+
+  // ------------------------- Called from init_db.js
+ 
+  this.initializeDb = function (done) {
+    var sql = fs.readFileSync("../common/init_db.sql", "utf8");
+    db.exec(sql, done);
   };
 };
 

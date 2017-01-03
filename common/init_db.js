@@ -1,5 +1,8 @@
 var db = new (require("../common/db.js").Db)();
 
-db.initializeDb(function (err) {
-  console.log(err);
-});
+console.log("are you sure??");
+if (0) {
+  db.initializeDb(function (err) {
+    console.log(err);
+  });
+}
