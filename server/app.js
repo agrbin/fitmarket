@@ -34,7 +34,7 @@ function setUpAuth() {
   passport.use(new GoogleStrategy(
     config.google,
     function(accessToken, refreshToken, profile, cb) {
-      return cb(null, sha1(profile.id));
+      return cb(null, sha1(profile.id + config.userIdHashSalt));
     }
   ));
 

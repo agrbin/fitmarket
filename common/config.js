@@ -36,6 +36,8 @@ module.exports = {
   maxWeight : 150,
 
   enableSelfShares : true,
+
+  userIdHashSalt : "secret",
 };
 
 // in override file, do something like:
