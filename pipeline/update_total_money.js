@@ -43,6 +43,12 @@ module.exports.updateTotalMoney = function(done) {
         return done(e);
       }
     }
-    db.updateTotalMoney(newAssets, done);
+    db.updateTotalMoney(newAssets, function (err) {
+      if (err) {
+        return done(err);
+      }
+      console.log("Total money updated!");
+      done(null);
+    });
   });
 };
