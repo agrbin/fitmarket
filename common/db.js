@@ -199,10 +199,12 @@ module.exports.Db = function () {
     var sql = " \
       UPDATE stream_credentials SET latest_weight = ( \
         SELECT weight FROM stream_data sd1 \
-        WHERE sd1.date = ( \
+        WHERE \
+          sd1.stream_id = stream_credentials.stream_id AND \
+          sd1.date = ( \
           SELECT MAX(sd2.date) \
             FROM stream_data sd2 \
-            WHERE sd1.stream_id = sd2.stream_id) \
+            WHERE sd2.stream_id = stream_credentials.stream_id) \
       )";
     db.run(sql, done);
   };
