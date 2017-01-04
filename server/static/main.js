@@ -223,9 +223,10 @@ $(function () {
             axisLabelWidth : 18,
           },
         },
-        strokeWidth : 2,
-        highlightCircleSize : 4,
+        strokeWidth : 1,
+        highlightCircleSize : 2,
         gridLineColor : "#ccc",
+        connectSeparatedPoints : true,
         legend: 'always',
         drawPoints: true,
         drawCallback: setUpZoomButtons 

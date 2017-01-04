@@ -20,9 +20,15 @@ else
   exit 1
 fi
 
+echo running service fitmarket stop..
+sudo service fitmarket stop
+
 cp -r $root/{server,pipeline,common,node_modules} \
   $target
 
 mkdir -p $target/data/
 cp $root/deploy/config.override.xfer.js $target/data/config.override.js
 
+# Wait to avoid addr in use error
+sleep 1
+sudo service fitmarket start
