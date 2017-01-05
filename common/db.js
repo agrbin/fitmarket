@@ -269,17 +269,18 @@ module.exports.Db = function () {
            done);
   };
 
-  this.addNewStream = function (stream_id, stream_name,
-      fitbit_user_id, access_token, refresh_token, done) {
+  this.addNewStream = function (stream_id, stream_name, provider,
+      provider_user_id, access_token, refresh_token, done) {
 
     // don't add new stream if user_id already has stream!
     db.run("INSERT INTO stream_credentials " +
-           "(stream_id, stream_name, " +
-              "fitbit_user_id, access_token, refresh_token)   " +
-           "VALUES (?, ?, ?, ?, ?)",
+           "(stream_id, stream_name, provider, " +
+              "provider_user_id, access_token, refresh_token)   " +
+           "VALUES (?, ?, ?, ?, ?, ?)",
            stream_id,
            stream_name,
-           fitbit_user_id,
+           provider,
+           provider_user_id,
            access_token,
            refresh_token,
            done);

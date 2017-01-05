@@ -20,18 +20,32 @@ function clone(x) {
 }
 
 function setUpAuth() {
+  // fitbit
   passport.use(new FitbitStrategy(
     config.fitbit,
     function(accessToken, refreshToken, profile, done) {
       done(null, {
-        fitbit_id: profile.id,
+        profile_id: profile.id,
         accessToken: accessToken,
         refreshToken: refreshToken,
       });
     }
   ));
 
-  passport.use(new GoogleStrategy(
+  // googlefit
+  passport.use('googlefit', new GoogleStrategy(
+    config.googleFit,
+    function(accessToken, refreshToken, profile, done) {
+      done(null, {
+        profile_id: profile.id,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      });
+    }
+  ));
+
+  // google
+  passport.use('google', new GoogleStrategy(
     config.google,
     function(accessToken, refreshToken, profile, cb) {
       return cb(null, sha1(profile.id + config.userIdHashSalt));
@@ -50,18 +64,40 @@ function setUpAuth() {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // google
   app.get("/google/init",
     passport.authenticate("google",
-      {scope: ["https://www.googleapis.com/auth/userinfo.email"]}));
+      {scope: [
+        "https://www.googleapis.com/auth/userinfo.email",
+        ]}));
 
   app.get("/google/callback", 
     passport.authenticate("google", {failureRedirect: "/"}),
     function (req, res) {
       req.session.google = clone(req.session.passport.user);
-      res.redirect("/main");
+      res.redirect(req.session["redirectTo"] || "/main");
     }
   );
 
+  // googlefit
+  app.get("/googlefit/init",
+    passport.authenticate("googlefit", {
+      scope: [
+        "https://www.googleapis.com/auth/userinfo.email",
+        "https://www.googleapis.com/auth/fitness.body.read"
+      ],
+      accessType: "offline",
+    }));
+
+  app.get("/googlefit/callback",
+    passport.authenticate("googlefit", {failureRedirect: "/"}),
+    function (req, res) {
+      req.session.googlefit = clone(req.session.passport.user);
+      res.redirect(req.session["redirectTo"] || "/main");
+    }
+  );
+
+  // fitbit
   app.get("/fitbit/init",
     passport.authenticate("fitbit", {scope: ["profile", "weight"]}));
 
@@ -69,7 +105,7 @@ function setUpAuth() {
     passport.authenticate("fitbit", {failureRedirect: "/"}),
     function (req, res) {
       req.session.fitbit = clone(req.session.passport.user);
-      res.redirect("/new_stream");
+      res.redirect(req.session["redirectTo"] || "/main");
     }
   );
 }

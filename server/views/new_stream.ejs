@@ -1,25 +1,51 @@
 <h1>new data stream callback</h1>
 
-<br/>
+<p><%= message %></p>
 
 <% if (!has_google || !has_fitbit) { %>
-  <p>In order to add your stream, login with both google and fitbit.</p>
+  <p>Moras biti logiran sa googl-om i jednim od {fitbit, googleFit}.<p>
 <% } %>
 
 <% if (!has_google) { %>
   <a href="/google/init/">login with google</a><br/>
 <% } %>
 
+<% if (!has_googlefit) { %>
+  <a href="/googlefit/init/">login with google fit</a><br/>
+<% } %>
+
 <% if (!has_fitbit) { %>
   <a href="/fitbit/init/">login with fitbit</a><br/>
 <% } %>
 
-<% if (has_google && has_fitbit) { %>
+<% if (has_google && (has_fitbit | has_googlefit)) { %>
+  <br/>
   <form action="/new_stream/submit" method="post">
+    Potvrdi da zelis preuzeti podatke:
+    <% if (has_fitbit) { %>
+    <label for="fitbit">
+      <p>
+        <input type="radio" name="provider" id="fitbit" value="fitbit">
+        Fitbit
+      </p>
+    </label>
+    <% } %>
+
+    <% if (has_googlefit) { %>
+    <label for="googlefit">
+      <p>
+        <input type="radio" name="provider" id="googlefit" value="googlefit">
+        GoogleFit
+      </p>
+    </label>
+    <% } %>
+
     <label>
-      Give a nickname to your dataset:
+      Daj nadimak tvojim dionicama. Obicno koristimo kod od 4 velika slova (npr GOOG).<br/>
       <input type="text" name="name" />
     </label>
+
+    </br></br>
     <input type="submit" value="submit" />
   </form>
 <% } %>

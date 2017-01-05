@@ -6,13 +6,19 @@ module.exports = {
 
   port : 8080,
 
+  google : {
+    clientID:     null,
+    clientSecret: null,
+    callbackURL:  null,
+  },
+
   fitbit : {
     clientID:     null,
     clientSecret: null,
     callbackURL:  null,
   },
 
-  google : {
+  googleFit : {
     clientID:     null,
     clientSecret: null,
     callbackURL:  null,

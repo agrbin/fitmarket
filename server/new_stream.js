@@ -3,26 +3,60 @@ var config = require("../common/config.js"),
 
 module.exports.landing = function (req, res) {
   var has_google = !!req.session.google;
+  var has_googlefit = !!req.session.googlefit;
   var has_fitbit = !!req.session.fitbit;
+  req.session.redirectTo = "/new_stream";
   res.render("new_stream", {
+    message: req.session.message || "",
     has_google: has_google,
-    has_fitbit: has_fitbit,
+    has_googlefit: has_googlefit,
+    has_fitbit: has_fitbit
   });
 };
 
 module.exports.submit = function (req, res) {
   var has_google = !!req.session.google;
+  var has_googlefit = !!req.session.googlefit;
   var has_fitbit = !!req.session.fitbit;
   var has_name = !!req.body.name;
-  if (!has_google || !has_fitbit || !has_name) {
+
+  if (!has_google) {
+    req.session.message = "prijavi se s googlom da dodas svoj stream.";
     return res.redirect("/new_stream");
   }
+
+  if (!req.body.provider || (req.body.provider !== "googlefit" &&
+                             req.body.provider !== "fitbit")) {
+    req.session.message = "klikni na kruzic.";
+    return res.redirect("/new_stream");
+  }
+
+  if (req.body.provider == "googlefit" && !has_googlefit) {
+    req.session.message = "googlefit provider ali nisi logiran sa googlefit";
+    return res.redirect("/new_stream");
+  }
+
+  if (req.body.provider == "fitbit" && !has_fitbit) {
+    req.session.message = "fitbit provider ali nisi logiran sa fitbitom";
+    return res.redirect("/new_stream");
+  }
+
+  if (!req.body.name) {
+    req.session.message = "enter stream name.";
+    return res.redirect("/new_stream");
+  }
+
+  var credentials = req.body.provider == "googlefit" ?
+    req.session.googlefit :
+    req.session.fitbit;
+
   db.addNewStream(
     req.session.google,
     req.body.name,
-    req.session.fitbit.fitbit_id,
-    req.session.fitbit.accessToken,
-    req.session.fitbit.refreshToken,
+    req.body.provider,
+    credentials.profile_id,
+    credentials.accessToken,
+    credentials.refreshToken,
     function (err) {
       res.send(err ? err : "stream added.");
     }

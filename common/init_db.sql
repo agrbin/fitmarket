@@ -32,12 +32,14 @@ CREATE TABLE user (
  * 'stream_id' is google user_id of the user who owns the stream.
  * 'stream_name' is a stream nickname used in frontend.
  * 'latest_weight' (BW), the latest weight info, can be null.
+ * 'provider' is 'googlefit' or 'fitbit'.
  */
 DROP TABLE IF EXISTS stream_credentials;
 CREATE TABLE stream_credentials (
-  stream_id TEXT,
+  stream_id TEXT PRIMARY KEY,
   stream_name TEXT,
-  fitbit_user_id TEXT,
+  provider TEXT,
+  provider_user_id TEXT,
   access_token TEXT,
   refresh_token TEXT,
   latest_weight DOUBLE
