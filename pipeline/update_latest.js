@@ -5,5 +5,4 @@ var
 
 module.exports.updateLatest = function(done) {
   db.updateLatestWeight(done);
-  // TODO update total money!
 };

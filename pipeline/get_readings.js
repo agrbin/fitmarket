@@ -18,8 +18,11 @@ var googleApisClient = new google.auth.OAuth2(
 
 var metricHeader = { "Accept-Language" : "fr_FR" };
 
+// We don't allow values greater than 149. It would cause div by zero in some
+// code paths.
 function roundValue(x) {
-  return Math.round(x * 10) / 10;
+  return Math.min(config.maxWeight - 1,
+      Math.round(x * 10) / 10);
 }
 
 function getMin(arr) {
