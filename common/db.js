@@ -121,7 +121,7 @@ module.exports.Db = function () {
         SELECT user_name, total_money \
         FROM "user" \
         ORDER BY total_money DESC \
-        LIMIT 8; \
+        LIMIT 5; \
         ',
         done);
   };
