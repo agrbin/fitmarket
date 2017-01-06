@@ -47,7 +47,8 @@ function updateTable(additionalState) {
 
     $("td.name", elem).text(stream.stream_name);
     $("td.count .how_many", elem).text(user_count);
-    $("td.count .latest_weight", elem).text(stream.latest_weight);
+    $("td.count .latest_weight", elem).text(
+      formatValue(stream.latest_weight));
     $("span.total_value", elem).text(
       formatValue(user_count * stream.latest_weight)
     );

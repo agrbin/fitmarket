@@ -84,7 +84,7 @@
         <% for (var stream_id in actual) { %>
           <option value="<%= stream_id %>">
             <%= actual[stream_id].stream_name %>
-            (<%= actual[stream_id].latest_weight %> kg)
+            (<%= formatValue(actual[stream_id].latest_weight) %> kg)
           </option>
         <% } %>
       </select>
