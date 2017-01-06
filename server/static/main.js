@@ -17,6 +17,10 @@ function formatValue(x) {
   return x.formatMoney(1, ".", ",");
 }
 
+function shareOwner(stream_id) {
+  return stream_id.charAt(0) == '~' ? stream_id.substr(1) : stream_id;
+}
+
 // update table.
 function updateTable(additionalState) {
   var free_money_delta = 0;
@@ -95,6 +99,10 @@ function setUpBuySellButtons() {
     var result = {};
     var cnt = 0;
     for (var stream_id in actual) {
+      if (!js_payload.enableSelfShares &&
+          shareOwner(stream_id) == user.user_id) {
+        continue;
+      }
       if (is_buy) {
         // If I have enough money to buy at least one, I can buy.
         if (user.free_money >= actual[stream_id].latest_weight) {

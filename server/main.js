@@ -10,6 +10,7 @@ var topTraders = new TopTraders(db);
 module.exports.landing = function (req, res) {
   res.js_payload.actual = req.actual;
   res.js_payload.user = req.user;
+  res.js_payload.enableSelfShares = config.enableSelfShares;
 
   res.render("main", {
     page : "main",
