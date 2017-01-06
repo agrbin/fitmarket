@@ -31,7 +31,7 @@ div.plot-container {
 
 div.plot {
   position: absolute;
-  left: 10px;
+  left: 0px;
   right: 10px;
   top: 10px;
   bottom: 10px;
@@ -54,4 +54,14 @@ div#plot-overlay {
   margin: 0px;
   margin-left: 8px;
   padding: 0px 5px;
+}
+
+div#legend {
+  margin-top: 4px;
+  text-align: right;
+}
+
+div#legend span {
+  font-size: small;
+  white-space: nowrap;
 }

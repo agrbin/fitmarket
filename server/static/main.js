@@ -228,10 +228,11 @@ $(function () {
         document.getElementById("plot"), "/main/plot_txt", {
         axes : {
           y : {
-            axisLabelWidth : 18,
+            axisLabelWidth : 25,
           },
         },
         strokeWidth : 1,
+        labelsDiv : "legend",
         highlightCircleSize : 2,
         gridLineColor : "#ccc",
         connectSeparatedPoints : true,
