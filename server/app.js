@@ -82,12 +82,13 @@ function setUpAuth() {
   // googlefit
   app.get("/googlefit/init",
     passport.authenticate("googlefit", {
-      scope: [
-        "https://www.googleapis.com/auth/userinfo.email",
-        "https://www.googleapis.com/auth/fitness.body.read"
-      ],
-      accessType: "offline",
-    }));
+    scope: [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/fitness.body.read"
+    ],
+    accessType: "offline",
+    prompt: "consent",
+  }));
 
   app.get("/googlefit/callback",
     passport.authenticate("googlefit", {failureRedirect: "/"}),

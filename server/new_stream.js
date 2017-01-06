@@ -10,7 +10,8 @@ module.exports.landing = function (req, res) {
     message: req.session.message || "",
     has_google: has_google,
     has_googlefit: has_googlefit,
-    has_fitbit: has_fitbit
+    has_fitbit: has_fitbit,
+    session : JSON.stringify(req.session)
   });
 };
 

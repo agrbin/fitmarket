@@ -11,6 +11,10 @@ var db = new TransactionDatabase(new sqlite3.Database(config.db));
 module.exports.Db = function () {
   // ------------------- transactions
 
+  this.exec = function (sql, cb) {
+    db.exec(sql, cb);
+  };
+
   this.applyTransaction = function(t, done) {
     var sql_user = '                                 \
         UPDATE "user" SET                            \
@@ -218,7 +222,8 @@ module.exports.Db = function () {
 
   // Callback is called with each stream_credentials row in the db.
   this.getStreamCredentials = function(cb, done) {
-    db.each("SELECT stream_id, stream_name, access_token, refresh_token " +
+    db.each("SELECT stream_id, stream_name, " +
+            "provider, provider_user_id, access_token, refresh_token " +
             "FROM stream_credentials", cb, done);
   };
 
@@ -272,7 +277,6 @@ module.exports.Db = function () {
   this.addNewStream = function (stream_id, stream_name, provider,
       provider_user_id, access_token, refresh_token, done) {
 
-    // don't add new stream if user_id already has stream!
     db.run("INSERT INTO stream_credentials " +
            "(stream_id, stream_name, provider, " +
               "provider_user_id, access_token, refresh_token)   " +

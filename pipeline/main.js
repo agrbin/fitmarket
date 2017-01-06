@@ -10,10 +10,11 @@ var
   update_total_money = require("./update_total_money.js"),
   get_readings = require("./get_readings.js");
 
-// .. maybe pipeline as a process should be in a transaction. ?
-
 async.series(
   [
+    function (cb) {
+      db.exec("BEGIN TRANSACTION", cb);
+    },
     get_readings.getReadings,
     update_plot.updatePlot,
     update_latest.updateLatest,
@@ -22,8 +23,22 @@ async.series(
   function (err) {
     if (err) {
       console.log("Something failed: ", err);
+      db.exec("ROLLBACK;", function (err) {
+        if (err) {
+          console.log("rollback failed: ", err);
+        } else {
+          console.log("pipeline transaction rolled back.");
+        }
+      });
     } else {
-      console.log("All green!");
+      db.exec("COMMIT;", function (err) {
+        if (err) {
+          console.log("commit failed: ", err);
+        } else {
+          console.log("pipeline transaction commited.");
+          console.log("All green!");
+        }
+      });
     }
   }
 );
