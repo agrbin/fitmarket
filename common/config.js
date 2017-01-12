@@ -44,6 +44,8 @@ module.exports = {
   enableSelfShares : true,
 
   userIdHashSalt : "secret",
+
+  topTraders : 10,
 };
 
 // in override file, do something like:

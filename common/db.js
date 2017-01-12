@@ -120,9 +120,11 @@ module.exports.Db = function () {
     db.all(' \
         SELECT user_name, total_money \
         FROM "user" \
+        WHERE user_name != "changeme" \
         ORDER BY total_money DESC \
-        LIMIT 5; \
+        LIMIT ?; \
         ',
+        config.topTraders,
         done);
   };
 
