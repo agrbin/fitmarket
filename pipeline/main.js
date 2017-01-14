@@ -8,6 +8,7 @@ var
   update_plot = require("./update_plot.js"),
   update_latest = require("./update_latest.js"),
   update_total_money = require("./update_total_money.js"),
+  update_opportunity = require("./update_opportunity.js"),
   get_readings = require("./get_readings.js");
 
 async.series(
@@ -19,6 +20,7 @@ async.series(
     update_plot.updatePlot,
     update_latest.updateLatest,
     update_total_money.updateTotalMoney,
+    update_opportunity.updateOpportunity,
   ],
   function (err) {
     if (err) {
