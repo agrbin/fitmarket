@@ -7,8 +7,15 @@ var
 // There are infinite amount of objects in each class.
 // * space, sizes and costs are integral.
 // Exposed for testing purposes.
+var dpAll = {};
 function knapsack(space, sizes, weights) {
-  var dp = {}; 
+  // memozation is persistent for 'sizes' and 'weights'.
+  var cache_key = JSON.stringify(sizes) + JSON.stringify(weights);
+  if (!dpAll.hasOwnProperty(cache_key)) {
+    dpAll[cache_key] = {};
+  }
+  var dp = dpAll[cache_key];
+
   var n = sizes.length;
   if (sizes.length !== weights.length) {
     throw "invalid input: " + JSON.stringify([sizes, weights]);

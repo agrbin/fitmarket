@@ -209,7 +209,8 @@ $(function () {
   });
 });
 
-// navigation between market and personal
+// navigation between market and personal + stock time frame buttons + recent
+// trader timeframe buttons.
 $(function () {
   // persistent toolbars:
   // demos.jquerymobile.com/1.4.5/toolbar-fixed-persistent/
@@ -251,10 +252,10 @@ $(function () {
 
   // Stock time-range buttons.
   function activate() {
-    $(".time-span-buttons a").removeClass("ui-btn-active");
+    $(".plot-btn.time-span-buttons a").removeClass("ui-btn-active");
     $(this).addClass("ui-btn-active");
     $(this).blur();
-    var span_str = $(this).text();
+    var span_str = $(this).text().trim();
     var span_ms = 0;
     var now = new Date().getTime();
     switch (span_str) {
@@ -280,8 +281,23 @@ $(function () {
       return;
     }
     originalRange = plot.xAxisRange();
-    $(".time-span-buttons a").click(activate);
-    activate.call($("a.initial")[0]);
+    $(".plot-btn.time-span-buttons a").click(activate);
+    activate.call($(".plot-btn a.initial")[0]);
   }
+
+  // toplist period navigation
+  function activateToplist() {
+    $(".toplist-btn.time-span-buttons a").removeClass("ui-btn-active");
+    $(this).addClass("ui-btn-active");
+    $(this).blur();
+    var span_str = $(this).text().trim();
+    $(".toplist-div").hide();
+    console.log($(this).text().trim());
+    $(".toplist-div." + span_str).show();
+  }
+  $(".toplist-div").hide();
+  $(".toplist-btn.time-span-buttons a").click(activateToplist);
+  activateToplist.call(
+    $(".toplist-btn.time-span-buttons a:contains(3d)")[0]);
 });
 

@@ -82,6 +82,11 @@ module.exports.Db = function () {
 
   // ------------------- user handling
 
+  this.updateOpportunity = function (user_id, opportunity_str, done) {
+    db.run("UPDATE user SET opportunity = ? WHERE user_id = ?;",
+          opportunity_str, user_id, done);
+  };
+
   this.updateTotalMoney = function (pairs, done) {
     // 1. create temp table
     // 2. populate with data
@@ -118,13 +123,10 @@ module.exports.Db = function () {
 
   this.getTopTraders = function (done) {
     db.all(' \
-        SELECT user_name, total_money \
+        SELECT user_name, total_money, opportunity \
         FROM "user" \
-        WHERE user_name != "changeme" \
-        ORDER BY total_money DESC \
-        LIMIT ?; \
+        WHERE user_name != "changeme"; \
         ',
-        config.topTraders,
         done);
   };
 
@@ -174,6 +176,57 @@ module.exports.Db = function () {
 
   // ------------------- stream handling
 
+  function getInverseLatestReading(row) {
+    var result = JSON.parse(JSON.stringify(row));
+    result.stream_id = "~" + result.stream_id;
+    result.stream_name = "~" + result.stream_name;
+    result.latest_weight = config.maxWeight - result.latest_weight;
+    return result;
+  }
+
+  function getInverseReading(row) {
+    var result = JSON.parse(JSON.stringify(row));
+    result.stream_id = "~" + result.stream_id;
+    result.stream_name = "~" + result.stream_name;
+    result.weight = config.maxWeight - result.weight;
+    return result;
+  }
+
+  // returns all stream data in date interval [firstDate, lastDate]
+  this.getStreamData = function (firstDate, lastDate, done) {
+    db.all("SELECT date, stream_id, stream_name, weight " +
+           "FROM stream_data " +
+           "WHERE date >= ? AND date <= ?;",
+           firstDate,
+           lastDate,
+           function (err, arr) {
+             if (err) {
+               return done(err);
+             }
+             var original_length = arr.length;
+             for (var i = 0; i < original_length; ++i) {
+               arr.push(getInverseReading(arr[i]));
+             }
+             done(null, arr);
+           });
+  };
+
+  // returns full total money for all users on dates newer than firstDate.
+  this.getTotalMoneyLogs = function (firstDate, done) {
+    db.all(" \
+      SELECT \
+        STRFTIME('%Y-%m-%d', timestamp/1e3, 'unixepoch') AS date, \
+        user_id, \
+        MAX(total_money) AS total_money \
+      FROM \
+        total_money_log \
+      WHERE \
+        date > ? \
+      GROUP BY date, user_id; \
+      "
+      , firstDate, done);
+  }
+
   this.getLatestWeights = function (done) {
     var actual = {};
     db.each(" \
@@ -182,17 +235,17 @@ module.exports.Db = function () {
       function (err, row) {
         if (err) return done(err);
         if (row.latest_weight > 0) {
+          var inverse_row = getInverseLatestReading(row);
           actual[row.stream_id] = {
             stream_id : row.stream_id,
             stream_name : row.stream_name,
             latest_weight : row.latest_weight,
-          }
-          var inv_id = "~" + row.stream_id;
-          actual[inv_id] = {
-            stream_id : inv_id,
-            stream_name : "~" + row.stream_name,
-            latest_weight : config.maxWeight - row.latest_weight,
-          }
+          };
+          actual[inverse_row.stream_id] = {
+            stream_id : inverse_row.stream_id,
+            stream_name : inverse_row.stream_name,
+            latest_weight : inverse_row.latest_weight,
+          };
         }
       },
       function (err) {

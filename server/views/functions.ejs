@@ -16,4 +16,31 @@ formatValue = function (x) {
   return x.formatMoney(1, ".", ",");
 };
 
+formatChangeRatio = function (x) {
+  var map = {"zero" : "", "up" : "+", "down" : "-"};
+  return map[formatChangeClass(x)] +
+    Math.abs((x * 100) - 100).toFixed(2);
+};
+
+formatChangeClass = function (x) {
+  if (Math.abs(x - 1) < 0.0001) {
+    return "zero";
+  }
+  return x > 1 ? "up" : "down";
+};
+
+formatClass = function (x) {
+  if (Math.abs(x) < 0.0001) {
+    return "zero";
+  }
+  if (x > 0.5) {
+    return "godlike";
+  }
+  return x > 0 ? "up" : "down";
+};
+
+formatRatio = function (x) {
+  return (x * 100).toFixed(2);
+};
+
 %>

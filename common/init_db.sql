@@ -16,6 +16,21 @@
  *
  * 'shares' (FW) is a JSON encoded object that encodes user's shares in possesion.
  *    {TEXT "stream_id" => INT "count"},
+ *
+ * 'opportunity' (BW) is a data structure that encodes potential total_money if
+ * player was playing optimal in recent time (time periods defined in
+ * config.opportunityIntervals).
+ *    {
+ *      "1d" => {
+ *        initial_money: money,
+ *        best_cost: money,
+ *      }
+ *    }
+ *
+ * - initial_money is user's money at the beggining of the time period.
+ * best_cost is the best possible total money that user could raised given the
+ * stock movements.
+ *
  */
 DROP TABLE IF EXISTS user;
 CREATE TABLE user (
@@ -23,7 +38,8 @@ CREATE TABLE user (
   user_name TEXT,
   free_money DOUBLE,
   total_money DOUBLE,
-  shares TEXT
+  shares TEXT,
+  opportunity TEXT,
 );
 
 /* 

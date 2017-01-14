@@ -3,6 +3,23 @@ span.value:after {
   color: gray;
 }
 
+span.ratio.godlike { color: green; font-weight: bold; }
+span.ratio.up { color: green; }
+span.ratio.down { color: red; }
+span.ratio.zero { color: gray; }
+
+span.change-ratio.up { color: green; }
+span.change-ratio.down { color: red; }
+span.change-ratio.zero { color: gray; }
+span.change-ratio:after, span.ratio:after { content: " %"; }
+
+div.toplist td:first-child { text-align: left; }
+div.toplist th:first-child { text-align: left; }
+div.toplist td { text-align: right; }
+div.toplist th { text-align: right; }
+div.toplist td:last-child { padding-right: 20px; }
+div.toplist th:last-child { padding-right: 20px; }
+
 tr.in_update_buy {
   background-color: #ebffeb;
 }

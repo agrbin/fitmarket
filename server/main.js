@@ -19,6 +19,8 @@ module.exports.landing = function (req, res) {
     session : JSON.stringify(req.session),
     actual : req.actual,
     js_payload : JSON.stringify(res.js_payload),
+    opportunity_intervals : config.opportunityIntervals,
+    opportunities : topTraders.getOpportunities(),
   });
 };
 

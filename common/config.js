@@ -46,6 +46,26 @@ module.exports = {
   userIdHashSalt : "secret",
 
   topTraders : 10,
+
+  // We calculate optimal strategies for each player in these intervals.
+  opportunityIntervals : {
+    "1d": {
+      count: 1,
+      unit: "day",
+    },
+    "3d": {
+      count: 3,
+      unit: "days",
+    },
+    "1w": {
+      count: 1,
+      unit: "week",
+    },
+    "1m": {
+      count: 1,
+      unit: "month",
+    },
+  },
 };
 
 // in override file, do something like:
