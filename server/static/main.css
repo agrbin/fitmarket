@@ -75,10 +75,18 @@ div#plot-overlay {
 
 div#legend {
   margin-top: 4px;
-  text-align: right;
+  text-align: center;
+}
+
+div#legend span.hide {
+  opacity: 0.3;
 }
 
 div#legend span {
+  cursor: default;
   font-size: small;
+  font-weight: bold;
+  display: inline;
   white-space: nowrap;
+  margin-left: 15px;
 }

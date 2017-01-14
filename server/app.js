@@ -118,6 +118,7 @@ app.set("views", "views");
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('./static'))
+app.use(express.static('./../node_modules/dygraphs/dist/'));
 
 // Attaches .info() and .error() on response.
 app.use(function (req, res, next) {

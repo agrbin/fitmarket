@@ -198,7 +198,7 @@ $(function () {
 
     $("input#count", form)
       .attr("max", max_cnt)
-      .val(Math.round(max_cnt / 2) + 1)
+      .val(max_cnt)
       .slider("refresh");
 
     $(".slider-container", form).show();
@@ -234,11 +234,11 @@ $(function () {
           },
         },
         strokeWidth : 1,
-        labelsDiv : "legend",
+        labelsSeparateLines: false,
         highlightCircleSize : 2,
         gridLineColor : "#ccc",
         connectSeparatedPoints : true,
-        legend: 'always',
+        legend: false,
         drawPoints: true,
         drawCallback: setUpZoomButtons 
       });
@@ -280,6 +280,26 @@ $(function () {
     if (originalRange !== null) {
       return;
     }
+    for (var id in js_payload.actual) {
+      var name = js_payload.actual[id].stream_name;
+      var prop = plot.getPropertiesForSeries(name);
+      if (name.charAt(0) != '~') {
+        $("<span></span>")
+          .css("color", prop.color)
+          .data("id", plot.indexFromSetName(name) - 1)
+          .attr('unselectable', 'on')
+          .css('user-select', 'none')
+          .on('selectstart', false)
+          .text(name).appendTo($("div#legend"));
+      }
+    }
+    // get all series, colors and ids.
+    $("div#legend span").click(function (e) {
+      e.preventDefault();
+      var id = $(this).data("id");
+      $(this).toggleClass("hide");
+      plot.setVisibility(id, !$(this).hasClass("hide"));
+    });
     originalRange = plot.xAxisRange();
     $(".plot-btn.time-span-buttons a").click(activate);
     activate.call($(".plot-btn a.initial")[0]);
@@ -292,7 +312,6 @@ $(function () {
     $(this).blur();
     var span_str = $(this).text().trim();
     $(".toplist-div").hide();
-    console.log($(this).text().trim());
     $(".toplist-div." + span_str).show();
   }
   $(".toplist-div").hide();
