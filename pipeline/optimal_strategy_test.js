@@ -56,9 +56,9 @@ function expectEq(lhs, rhs) {
 
 // tests knapsack.
 (function () {
-  expectEq(1, os.knapsack(10, [6], [1]));
-  expectEq(6, os.knapsack(10, [6, 3], [5, 1]));
-  expectEq(7, os.knapsack(10, [4, 3], [3, 2]));
+  expectEq(14, os.knapsack(10, [6], [10]));
+  expectEq(61, os.knapsack(10, [6, 3], [50, 10]));
+  expectEq(70, os.knapsack(10, [4, 3], [30, 20]));
 })();
 
 // tests optimal strategy with one stream.

@@ -4,6 +4,9 @@ var
 
 // Objects of class i take sizes[i] space and gives you weights[i] weight.
 // What is the maximum weight you can get by fitting objects into 'space'.
+// Space unit that is left unused counts as weight unit. That is different from
+// the usual knapsack.
+//
 // There are infinite amount of objects in each class.
 // * space, sizes and costs are integral.
 // Exposed for testing purposes.
@@ -29,7 +32,7 @@ function knapsack(space, sizes, weights) {
     if (dp.hasOwnProperty(k)) {
       return dp[k];
     }
-    var sol = 0;
+    var sol = k;
     for (var i = 0; i < n; ++i) {
       sol = Math.max(sol, solve(k - sizes[i]) + weights[i]);
     }
