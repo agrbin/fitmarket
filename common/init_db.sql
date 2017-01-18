@@ -39,7 +39,7 @@ CREATE TABLE user (
   free_money DOUBLE,
   total_money DOUBLE,
   shares TEXT,
-  opportunity TEXT,
+  opportunity TEXT
 );
 
 /* 

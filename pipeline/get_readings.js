@@ -95,7 +95,7 @@ function getGoogleFitReadings(date_from_str, done) {
     }
     console.log("  Got readings for " + 
                 aggregatedReadings.length + " days.");
-    done(null, aggregatedReadings);
+    done(null, date_from_str, aggregatedReadings);
   });
 }
 
@@ -168,7 +168,7 @@ function getFitbitReadings(date_from_str, done) {
       }
       console.log("  Got readings for " + 
                   aggregatedReadings.length + " days.");
-      cb(null, aggregatedReadings);
+      cb(null, date_from_str, aggregatedReadings);
     }
   ], done);
 }
@@ -189,9 +189,30 @@ function saveStreamData(stream, done) {
       getFitbitReadings.bind(stream) :
       getGoogleFitReadings.bind(stream)),
     // Write readings into the database.
-    function (readings_arr, done) {
-      db.writeDataPoints(
-          stream.stream_id, stream.stream_name, readings_arr, done);
+    function (date_from_str, readings_arr, done) {
+      var fallback = moment().subtract(2 * 365, "days").format("YYYY-MM-DD");
+      if (date_from_str === fallback) {
+        // first time seen this stream. write everything.
+        console.log("  first time seen this feed. writing all.");
+        db.writeDataPoints(
+            stream.stream_id, stream.stream_name, readings_arr, done);
+      } else if (readings_arr.length > 0) {
+        console.log("  writing new readings only for today.")
+        // Write only the value for today. This will be the minimum value of
+        // all new readings.  New readings happened only after noon at
+        // yesterday. If they happened before, they would be processed
+        // yesterday and we wouldn't download them now.
+        var min = Infinity;
+        for (var i = 0; i < readings_arr.length; ++i) {
+          min = Math.min(min, readings_arr[i][1]);
+        }
+        var overridenReadings = [[moment().format("YYYY-MM-DD"), min]];
+        db.writeDataPoints(
+            stream.stream_id, stream.stream_name, overridenReadings, done);
+      } else {
+        console.log("  no new readings, next message is rubish.");
+        done(null);
+      }
     },
     function (done) {
       console.log("  New readings written to db.");
