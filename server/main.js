@@ -244,7 +244,7 @@ module.exports.apiSubmit = function (req, res) {
 module.exports.apiSellAll = function (req, res) {
   db.applyTransaction({
     user_id : req.user.user_id,
-    new_shares : [],
+    new_shares : {},
     new_free_money : req.user.total_money,
     datetime: moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
     action: "sell_all",
