@@ -132,8 +132,12 @@ app.use(function (req, res, next) {
     res.js_payload.info.push(msg);
   };
   res.error = function (msg) {
-    console.log(msg);
-    res.status(500).send(msg);
+    console.log("Err: ", msg);
+    res.status(500).send("Err: " + msg + "\n");
+  };
+  res.json = function (object) {
+    res.header("Content-Type", "application/json");
+    res.send(JSON.stringify(object, null, 2) + "\n");
   };
   next();
 });
@@ -143,6 +147,15 @@ app.get("/",
   ensureLoggedOut("/main"),
   function (req, res) { res.render("landing"); }
 );
+
+function parseShares(req) {
+  try {
+    req.user.shares = JSON.parse(req.user.shares);
+  } catch (e) {
+    console.log("can't parse user shares: ", req.user, e);
+    req.user.shares = {};
+  }
+}
 
 // I was considering using passport.deserializeUser but that doesn't play well
 // with fitbit auth.
@@ -155,12 +168,21 @@ function getUserFromDb(req, res, next) {
       return res.error(err);
     }
     req.user = user;
-    try {
-      req.user.shares = JSON.parse(req.user.shares);
-    } catch (e) {
-      console.log("can't parse user shares: ", req.user, e);
-      req.user.shares = {};
+    parseShares(req);
+    next();
+  });
+}
+
+function getUserFromDbByToken(req, res, next) {
+  if (!req.query.token) {
+    return res.error("add ?token=TOKEN to your request.");
+  }
+  db.getUserByToken(req.query.token, function (err, user) {
+    if (err) {
+      return res.error(err);
     }
+    req.user = user;
+    parseShares(req);
     next();
   });
 }
@@ -172,6 +194,11 @@ function getLatestWeights(req, res, next) {
       return res.error(err);
     }
     req.actual = actual;
+    req.actualByStreamName = {};
+    for (var stream_id in actual) {
+      req.actualByStreamName[actual[stream_id].stream_name] =
+        actual[stream_id];
+    }
     next();
   });
 }
@@ -182,13 +209,30 @@ var mainMid = [
   getLatestWeights,
 ];
 
+var apiMid = [
+  getUserFromDbByToken,
+  getLatestWeights,
+];
+
+// FRONTEND
 app.get("/main/plot_txt", mainMid, main.path_txt); 
 app.get("/main", mainMid, main.landing);
 app.post("/main/personal/update", mainMid, main.personalUpdate);
 app.post("/main/personal/submit", mainMid, main.submitTransaction);
 
+// NEW STREAM
 app.get("/new_stream", new_stream.landing);
 app.post("/new_stream/submit", new_stream.submit);
+
+// API
+app.get("/main/api_token", mainMid, main.apiToken);
+app.get("/main/reset_token", mainMid, main.resetToken);
+
+app.get("/api/plot_txt", apiMid, main.path_txt);
+app.get("/api/mystate", apiMid, main.apiMyState);
+app.get("/api/actual_state", apiMid, main.apiActualState);
+app.post("/api/submit", apiMid, main.apiSubmit);
+app.post("/api/sell_all", apiMid, main.apiSellAll);
 
 app.listen(config.port, function () {
   console.log("Listening on port ", config.port);

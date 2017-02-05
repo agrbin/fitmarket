@@ -3,6 +3,7 @@ var sqlite3 = require("sqlite3").verbose(),
   config = require("../common/config.js"),
   fs = require("fs"),
   async = require("async"),
+  crypto = require("crypto"),
   moment = require("moment");
 
 // One connection per process.
@@ -31,12 +32,12 @@ module.exports.Db = function () {
           INSERT INTO transaction_log (                \
             datetime, user_id, user_name,              \
             stream_id, stream_name, stream_weight,     \
-            action, count                              \
+            action, count, is_api                      \
             )                                          \
           VALUES (                                     \
             $datetime, $user_id, $user_name,           \
             $stream_id, $stream_name, $stream_weight,  \
-            $action, $count                            \
+            $action, $count, $is_api                  \
             );                                         ';
     var vars_log = {
       $datetime: t.datetime,
@@ -47,6 +48,7 @@ module.exports.Db = function () {
       $stream_weight: t.stream_weight,
       $user_id: t.user_id,
       $user_name: t.user_name,
+      $is_api: t.is_api,
     };
 
     // TODO, can this be less entangled??
@@ -143,24 +145,44 @@ module.exports.Db = function () {
            "WHERE user_id = ?", user_name, user_id, done); 
   };
 
+  // done is called with random token.
+  function generateApiToken(done) {
+    crypto.randomBytes(10, function(err, buffer) {
+      if (err) {
+        return err;
+      }
+      var str = buffer.toString('hex');
+      var i = (Math.random() * str.length) | 0;
+      done(null,
+        str.substr(0, i) + "s1ava0cu" + str.substr(i));
+    });
+  }
+
   function createInitialUser(user_id, done) {
     var tmpl = JSON.parse(JSON.stringify(config.initial_user_tmpl));
     tmpl.user_id = user_id;
-    db.run("INSERT INTO user " +
-           "(user_id, user_name, " +
-              "free_money, total_money, shares)   " +
-           "VALUES (?, ?, ?, ?, ?)",
-           tmpl.user_id,
-           tmpl.user_name,
-           tmpl.free_money,
-           tmpl.total_money,
-           tmpl.shares,
-           function (err) { done(err, tmpl); });
+    generateApiToken(function (err, api_token) {
+      if (err) {
+        return done(err);
+      }
+      db.run("INSERT INTO user " +
+             "(user_id, user_name, " +
+                "free_money, total_money, shares, api_token) " +
+             "VALUES (?, ?, ?, ?, ?, ?)",
+             tmpl.user_id,
+             tmpl.user_name,
+             tmpl.free_money,
+             tmpl.total_money,
+             tmpl.shares,
+             api_token,
+             function (err) { done(err, tmpl); });
+    });
   }
 
   // Returns the user's row. Initializes the user if row is still not there.
   this.getUser = function (user_id, done) {
-    db.get("SELECT user_id, user_name, free_money, total_money, shares " +
+    db.get("SELECT user_id, user_name, free_money, " +
+           "total_money, shares, api_token " +
            "FROM user " +
            "WHERE user_id = ?", user_id, function (err, row) {
       if (err) {
@@ -171,6 +193,41 @@ module.exports.Db = function () {
       } else {
         done(null, row);
       }
+    });
+  };
+
+  this.getUserByToken = function (token, done) {
+    db.get("SELECT user_id, user_name, free_money, " +
+           "total_money, shares, api_token " +
+           "FROM user " +
+           "WHERE api_token = ?", token, function (err, row) {
+      if (err) {
+        return done(err);
+      }
+      if (!row) {
+        done("unknown token.");
+      } else {
+        done(null, row);
+      }
+    });
+  };
+
+  this.resetToken = function (user_id, done) {
+    generateApiToken(function (err, new_token) {
+      if (err) {
+        return done(err);
+      }
+      db.run("UPDATE user " +
+             "SET api_token = ? " +
+             "WHERE user_id = ?",
+             new_token,
+             user_id,
+             function (err) {
+               if (err) {
+                 return done(err);
+               }
+               done(null, new_token);
+             });
     });
   };
 

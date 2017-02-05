@@ -25,6 +25,7 @@ module.exports.landing = function (req, res) {
 };
 
 module.exports.path_txt = function (req, res) {
+  res.header("Content-Type", "text/csv");
   res.sendFile(path.resolve(config.plot_txt));
 };
 
@@ -39,6 +40,9 @@ module.exports.personalUpdate = function (req, res) {
 
 // x is a valid number if it's positive and and integral.
 function isValidCount(x) {
+  if (!x) {
+    return false;
+  }
   return Math.round(x).toString() == x.toString() && x > 0;
 }
 
@@ -122,6 +126,7 @@ module.exports.submitTransaction = function (req, res) {
       stream_id: req.body.stream,
       action: req.body.action,
       count: Number(req.body.count),
+      is_api: false,
     },
     req.actual,
     req.user,
@@ -143,4 +148,117 @@ module.exports.submitTransaction = function (req, res) {
 };
 
 module.exports.validateTransaction = validateTransaction;
+
+module.exports.apiToken = function (req, res) {
+  if (req.user.api_token === null) {
+    console.log("reinitializing token for: ", req.user.user_id);
+    db.resetToken(req.user.user_id, function (err, new_token) {
+      if (err) {
+        return res.error(err);
+      }
+      res.send(new_token);
+    });
+  } else {
+    res.send(req.user.api_token);
+  }
+};
+
+module.exports.resetToken = function (req, res) {
+  if (req.query.old_token !== req.user.api_token) {
+    return res.error("old token mismatch.");
+  }
+  db.resetToken(req.user.user_id,
+    function (err, new_token) {
+      if (err) {
+        return res.error(err);
+      }
+      res.send(new_token);
+    });
+};
+
+function roundTo1(x) {
+  return Math.round(x * 10) / 10;
+}
+
+module.exports.apiMyState = function (req, res) {
+  var result = {
+    total_money: roundTo1(req.user.total_money),
+    free_money: roundTo1(req.user.free_money),
+    shares: [],
+  };
+  for (var stream_id in req.user.shares) {
+    result.shares.push({
+      stream_name: req.actual[stream_id].stream_name,
+      latest_weight: req.actual[stream_id].latest_weight,
+      count: req.user.shares[stream_id],
+    });
+  }
+  res.json(result);
+};
+
+module.exports.apiActualState = function (req, res) {
+  var result = [];
+  for (var stream_id in req.actual) {
+    result.push({
+      stream_name: req.actual[stream_id].stream_name,
+      latest_weight: roundTo1(req.actual[stream_id].latest_weight),
+    });
+  }
+  res.json(result);
+};
+
+module.exports.apiSubmit = function (req, res) {
+  if (!req.body.stream_name) {
+    return res.error("must specifyc stream_name in POST params.");
+  }
+  if (!req.actualByStreamName.hasOwnProperty(req.body.stream_name)) {
+    return res.error("unknown stream: " + req.body.stream_name);
+  }
+  validateTransaction(
+    {
+      datetime: moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
+      stream_id: req.actualByStreamName[req.body.stream_name].stream_id,
+      action: req.body.action,
+      count: Number(req.body.count),
+      is_api: true,
+    },
+    req.actual,
+    req.user,
+    config,
+    function (err, transaction) {
+      if (err) {
+        return res.error(err);
+      }
+      db.applyTransaction(
+        transaction,
+        function (err) {
+          if (err) {
+            return res.error(err);
+          }
+          res.send("submitted!\n");
+        });
+    }
+  );
+};
+
+module.exports.apiSellAll = function (req, res) {
+  db.applyTransaction({
+    user_id : req.user.user_id,
+    new_shares : [],
+    new_free_money : req.user.total_money,
+    datetime: moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
+    action: "sell_all",
+    stream_id: null,
+    count: null,
+    stream_name: null,
+    stream_weight: null,
+    user_name : req.user.user_name,
+    is_api: 1,
+  }, function (err) {
+    if (err) {
+      return res.error(err);
+    }
+    res.send("submitted!\n");
+  });
+};
 

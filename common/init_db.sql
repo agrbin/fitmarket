@@ -39,7 +39,8 @@ CREATE TABLE user (
   free_money DOUBLE,
   total_money DOUBLE,
   shares TEXT,
-  opportunity TEXT
+  opportunity TEXT,
+  api_token TEXT
 );
 
 /* 
@@ -97,7 +98,8 @@ CREATE TABLE transaction_log (
   stream_name TEXT,
   stream_weight DOUBLE,
   action TEXT,
-  count INT
+  count INT,
+  is_api BOOLEAN
 );
 
 /*
