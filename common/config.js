@@ -45,7 +45,7 @@ module.exports = {
 
   userIdHashSalt : "secret",
 
-  topTraders : 10,
+  topTraders : 15,
 
   // We calculate optimal strategies for each player in these intervals.
   opportunityIntervals : {

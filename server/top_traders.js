@@ -35,7 +35,7 @@ module.exports.TopTraders = function (db) {
       }
       // amo prvo sortirat i popunit result
       result = [];
-      for (var i = 0; i < Math.min(config.topTraders, rows.length); ++i) {
+      for (var i = 0; i < rows.length; ++i) {
         result.push({
           user_name: rows[i].user_name,
           total_money: rows[i].total_money,
@@ -44,6 +44,7 @@ module.exports.TopTraders = function (db) {
       result.sort(function (lhs, rhs) {
         return rhs.total_money - lhs.total_money;
       });
+      result = result.slice(0, config.topTraders);
       // amo sad popunit opportunities.
       opportunities = {};
       for (var periodId in config.opportunityIntervals) {
