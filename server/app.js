@@ -133,11 +133,19 @@ app.use(function (req, res, next) {
   };
   res.error = function (msg) {
     console.log("Err: ", msg);
-    res.status(500).send("Err: " + msg + "\n");
+    try {
+      res.status(500).send("Err: " + msg + "\n");
+    } catch (e) {
+      console.log("additionally while sending error response: ", e);
+    }
   };
   res.json = function (object) {
-    res.header("Content-Type", "application/json");
-    res.send(JSON.stringify(object, null, 2) + "\n");
+    try {
+      res.header("Content-Type", "application/json");
+      res.send(JSON.stringify(object, null, 2) + "\n");
+    } catch (e) {
+      console.log(e);
+    }
   };
   next();
 });

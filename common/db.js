@@ -59,19 +59,19 @@ module.exports.Db = function () {
       transaction.run(sql_user, vars_user,
         function (err) {
           if (err) {
-            transaction.rollback(function () {
+            return transaction.rollback(function () {
               done(err);
             });
           }
           if (this.changes !== 1) {
-            transaction.rollback(function () {
+            return transaction.rollback(function () {
               done("didn't update user as expected.");
             });
           }
           transaction.run(sql_log, vars_log,
             function (err) {
               if (err) {
-                transaction.rollback(function () {
+                return transaction.rollback(function () {
                   done(err);
                 });
               } else {
