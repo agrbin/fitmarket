@@ -218,31 +218,53 @@ $(function () {
   $( "[data-role='navbar']" ).navbar();
   $( "[data-role='header'], [data-role='footer']" ).toolbar();
   var plot = null;
+  var current = $(".ui-page-active").attr("id");
 
   function applyBtnActive() {
-    var current = $(".ui-page-active").attr("id");
     $("[data-role='navbar'] a.ui-btn-active").removeClass("ui-btn-active");
     $("[data-role='navbar'] a." + current).addClass("ui-btn-active");
+
+    var options = {
+      axes : {
+        y : {
+          axisLabelWidth : 25,
+        },
+      },
+      highlightSeriesOpts: {
+        strokeWidth: 5,
+        strokeBorderWidth: 2,
+        highlightCircleSize: 5
+      },
+      strokeWidth : 1,
+      labelsSeparateLines: false,
+      highlightCircleSize : 2,
+      gridLineColor : "#ccc",
+      connectSeparatedPoints : true,
+      legend: false,
+      drawPoints: true,
+      drawCallback: setUpZoomButtons,
+    };
 
     if (current == "market" && plot === null) {
       // Render the graph
       plot = new Dygraph(
-        document.getElementById("plot"), "/main/plot_txt", {
-        axes : {
-          y : {
-            axisLabelWidth : 25,
-          },
-        },
-        strokeWidth : 1,
-        labelsSeparateLines: false,
-        highlightCircleSize : 2,
-        gridLineColor : "#ccc",
-        connectSeparatedPoints : true,
-        legend: false,
-        drawPoints: true,
-        drawCallback: setUpZoomButtons 
-      });
+          document.getElementById("plot"),
+          "/main/plot_txt",
+          options);
     }
+    if (current == "total-money" && plot === null) {
+      // Render the graph
+      plot = new Dygraph(
+          document.getElementById("plot"),
+          "/main/total_money_plot_txt",
+          options);
+      window.plot = plot;
+    }
+    $(document).click(function () {
+      if (plot) {
+        plot.clearSelection();
+      }
+    });
   }
 
   $(document).on("pagecontainerchange", applyBtnActive);
@@ -280,16 +302,24 @@ $(function () {
     if (originalRange !== null) {
       return;
     }
-    for (var id in js_payload.actual) {
-      var name = js_payload.actual[id].stream_name;
+    for (var i = 0; i < plot.getLabels().length; ++i) {
+      var name = plot.getLabels()[i];
       var prop = plot.getPropertiesForSeries(name);
+      if (name == "date") {
+        continue;
+      }
       if (name.charAt(0) != '~') {
         $("<span></span>")
           .css("color", prop.color)
           .data("id", plot.indexFromSetName(name) - 1)
+          .data("name", name)
           .attr('unselectable', 'on')
           .css('user-select', 'none')
           .on('selectstart', false)
+          .on('mouseover', function () {
+            var name = $(this).data("name");
+            plot.setSelection(false, name, true);
+          })
           .text(name).appendTo($("div#legend"));
       }
     }
@@ -314,9 +344,12 @@ $(function () {
     $(".toplist-div").hide();
     $(".toplist-div." + span_str).show();
   }
-  $(".toplist-div").hide();
-  $(".toplist-btn.time-span-buttons a").click(activateToplist);
-  activateToplist.call(
-    $(".toplist-btn.time-span-buttons a:contains(3d)")[0]);
+
+  if (current != "total-money") {
+    $(".toplist-div").hide();
+    $(".toplist-btn.time-span-buttons a").click(activateToplist);
+    activateToplist.call(
+      $(".toplist-btn.time-span-buttons a:contains(3d)")[0]);
+  }
 });
 

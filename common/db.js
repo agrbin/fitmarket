@@ -332,6 +332,17 @@ module.exports.Db = function () {
             cb, done);
   };
 
+  this.getTotalMoneyForPlot = function (cb, done) {
+    var sql = "SELECT " +
+      "  user_name," +
+      "  STRFTIME('%Y-%m-%d', timestamp/1e3, 'unixepoch') AS date," +
+      "  total_money_log.total_money as total_money " +
+      "FROM total_money_log JOIN " +
+      "  user ON total_money_log.user_id = user.user_id " +
+      "WHERE user_name != 'changeme'";
+    db.each(sql, cb, done);
+  };
+
   // Callback is called with each stream_credentials row in the db.
   this.getStreamCredentials = function(cb, done) {
     db.each("SELECT stream_id, stream_name, " +

@@ -18,6 +18,7 @@ async.series(
     },
     get_readings.getReadings,
     update_plot.updatePlot,
+    update_plot.updateTotalMoneyPlot,
     update_latest.updateLatest,
     update_total_money.updateTotalMoney,
     update_opportunity.updateOpportunity,

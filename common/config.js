@@ -31,6 +31,7 @@ module.exports = {
   },
 
   plot_txt : "../data/plot.txt",
+  total_money_plot_txt : "../data/total_money_plot.txt",
 
   initial_user_tmpl : {
     user_name : "changeme",

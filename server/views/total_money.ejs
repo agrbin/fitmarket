@@ -1,0 +1,36 @@
+<%- include _head.ejs %>
+<%- include functions.ejs %> 
+
+<script>
+  var js_payload = <%- js_payload %>;
+  for (var key in {error:0, info:0}) {
+    for (var i = 0; i < js_payload[key].length; ++i) {
+      console.log(key + ":", js_payload[key][i]);
+    }
+  }
+</script>
+
+<div data-role="page" id="total-money">
+
+  <div class="ui-corner-all">
+    <div class="ui-bar ui-bar-a">
+      <h3>Stanje top-liste</h3>
+      <span class="plot-btn time-span-buttons">
+        <a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-mini">1w</a>
+        <a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-mini initial">1m</a>
+        <a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-mini">1y</a>
+        <a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-mini">max</a>
+      </span>
+    </div>
+    <div class="ui-body ui-body-a">
+      <div id="legend"></div>
+      <div class="plot-container">
+        <div id="plot" class="plot"></div>
+        <div id="plot-overlay"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<%- include _foot.ejs %>

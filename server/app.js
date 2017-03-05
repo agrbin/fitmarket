@@ -224,7 +224,9 @@ var apiMid = [
 
 // FRONTEND
 app.get("/main/plot_txt", mainMid, main.path_txt); 
+app.get("/main/total_money_plot_txt", mainMid, main.total_money_path_txt);
 app.get("/main", mainMid, main.landing);
+app.get("/total_money", mainMid, main.totalMoney);
 app.post("/main/personal/update", mainMid, main.personalUpdate);
 app.post("/main/personal/submit", mainMid, main.submitTransaction);
 

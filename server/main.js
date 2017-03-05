@@ -24,9 +24,26 @@ module.exports.landing = function (req, res) {
   });
 };
 
+module.exports.totalMoney = function (req, res) {
+  res.js_payload.actual = req.actual;
+  res.js_payload.user = req.user;
+  res.js_payload.enableSelfShares = config.enableSelfShares;
+
+  res.render("total_money", {
+    user : req.user,
+    page : "total-money",
+    js_payload : JSON.stringify(res.js_payload),
+  });
+};
+
 module.exports.path_txt = function (req, res) {
   res.header("Content-Type", "text/csv");
   res.sendFile(path.resolve(config.plot_txt));
+};
+
+module.exports.total_money_path_txt = function (req, res) {
+  res.header("Content-Type", "text/csv");
+  res.sendFile(path.resolve(config.total_money_plot_txt));
 };
 
 module.exports.personalUpdate = function (req, res) {
