@@ -34,6 +34,9 @@ function knapsack(space, sizes, weights) {
     }
     var sol = k;
     for (var i = 0; i < n; ++i) {
+      if (sizes[i] == Infinity) {
+        continue;
+      }
       sol = Math.max(sol, solve(k - sizes[i]) + weights[i]);
     }
     dp[k] = sol;

@@ -26,6 +26,14 @@ function expectEq(lhs, rhs) {
   }
 }
 
+function expectNe(lhs, rhs) {
+  var l = JSON.stringify(lhs, null, 2);
+  var r = JSON.stringify(rhs, null, 2);
+  if (l === r) {
+    console.log("FAIL! expected not equal: ", l, "got: ", r);
+  }
+}
+
 // tests initWeights.
 (function () {
   var o = new os.OptimalStrategy([
@@ -103,3 +111,9 @@ function expectEq(lhs, rhs) {
   expectEq(400, o.getOptimalStrategy(100, toDate(1)).best_cost);
 })();
 
+
+(function () {
+  expectNe(Infinity, os.knapsack(
+    98644, [ 832, 816, 920, 1113, Infinity, 668, 684, 580, 387, Infinity ], [ 834,
+    823, 914, 1102, Infinity, 666, 677, 586, 398, Infinity ]));
+})();

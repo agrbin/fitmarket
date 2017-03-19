@@ -278,7 +278,7 @@ module.exports.Db = function () {
       FROM \
         total_money_log \
       WHERE \
-        date > ? \
+        date >= ? \
       GROUP BY date, user_id; \
       "
       , firstDate, done);
