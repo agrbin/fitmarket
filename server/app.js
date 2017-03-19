@@ -75,7 +75,9 @@ function setUpAuth() {
     passport.authenticate("google", {failureRedirect: "/"}),
     function (req, res) {
       req.session.google = clone(req.session.passport.user);
-      res.redirect(req.session["redirectTo"] || "/main");
+      // Doesn't work. It looks like passport reinitializes the session when
+      // logging-in for the first time.
+      res.redirect(req.session.returnTo || "/main");
     }
   );
 
@@ -94,7 +96,7 @@ function setUpAuth() {
     passport.authenticate("googlefit", {failureRedirect: "/"}),
     function (req, res) {
       req.session.googlefit = clone(req.session.passport.user);
-      res.redirect(req.session["redirectTo"] || "/main");
+      res.redirect(req.session.returnTo || "/main");
     }
   );
 
@@ -106,7 +108,7 @@ function setUpAuth() {
     passport.authenticate("fitbit", {failureRedirect: "/"}),
     function (req, res) {
       req.session.fitbit = clone(req.session.passport.user);
-      res.redirect(req.session["redirectTo"] || "/main");
+      res.redirect(req.session.returnTo || "/main");
     }
   );
 }
