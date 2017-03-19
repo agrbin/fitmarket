@@ -319,10 +319,6 @@ $(function () {
           .attr('unselectable', 'on')
           .css('user-select', 'none')
           .on('selectstart', false)
-          .on('mouseover', function () {
-            var name = $(this).data("name");
-            plot.setSelection(false, name, true);
-          })
           .text(name).appendTo($("div#legend"));
       }
     }
