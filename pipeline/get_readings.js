@@ -202,13 +202,25 @@ function saveStreamData(stream, done) {
         // all new readings.  New readings happened only after noon at
         // yesterday. If they happened before, they would be processed
         // yesterday and we wouldn't download them now.
-        var min = Infinity;
+        var todaysWeight = null;
+        var maxDate = null;
         for (var i = 0; i < readings_arr.length; ++i) {
-          min = Math.min(min, readings_arr[i][1]);
+          var date = readings_arr[i][0];
+          if (maxDate === null || date > maxDate) {
+            maxDate = date;
+            todaysWeight = readings_arr[i][1];
+          }
         }
-        var overridenReadings = [[moment().format("YYYY-MM-DD"), min]];
-        db.writeDataPoints(
-            stream.stream_id, stream.stream_name, overridenReadings, done);
+        var todaysDate = moment().format("YYYY-MM-DD");
+        if (todaysDate != maxDate) {
+          done("  unexpected todaysDate != maxDate (" +
+              todaysDate + " vs " +
+              maxDate + ")");
+        } else {
+          var overridenReadings = [todaysDate, todaysWeight];
+          db.writeDataPoints(
+              stream.stream_id, stream.stream_name, overridenReadings, done);
+        }
       } else {
         console.log("  no new readings, next message is rubish.");
         done(null);
