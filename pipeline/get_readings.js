@@ -217,8 +217,10 @@ function saveStreamData(stream, done) {
           db.writeDataPoints(
               stream.stream_id, stream.stream_name, overridenReadings, done);
         } else {
-          done("  discarding readings from day before: " + todaysDate + " vs "
-              + maxDate + ")");
+          console.log("  discarding readings from day before: "
+                      + todaysDate + " vs " + maxDate + ". ",
+                      "next message is rubish.");
+          done(null);
         }
       } else {
         console.log("  no new readings, next message is rubish.");
@@ -234,6 +236,6 @@ function saveStreamData(stream, done) {
 
 // gets list of valid streams.
 module.exports.getReadings = function (stream_credentials, done) {
-  console.log("Needs to process " + stream_credentials.length + " streams.");
+  console.log("\nNeeds to process " + stream_credentials.length + " streams.");
   async.eachSeries(stream_credentials, saveStreamData, done);
 };
