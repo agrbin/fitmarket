@@ -413,6 +413,32 @@ module.exports.Db = function () {
            done);
   };
 
+  this.updateExistingStream = function (stream_id, provider,
+      provider_user_id, access_token, refresh_token, done) {
+    db.run("UPDATE stream_credentials SET " +
+             "provider = $provider, " +
+             "provider_user_id = $provider_user_id, " +
+             "access_token = $access_token, " +
+             "refresh_token = $refresh_token " +
+           "WHERE stream_id = $stream_id",
+           {
+             $stream_id : stream_id,
+             $provider : provider,
+             $provider_user_id : provider_user_id,
+             $access_token : access_token,
+             $refresh_token : refresh_token,
+           },
+           function (err) {
+             if (err) {
+               return done(err);
+             }
+             if (this.changes !== 1) {
+               return done("failed to find the row!");
+             }
+             done(null);
+           });
+  };
+
   // ------------------------- Called from init_db.js
  
   this.initializeDb = function (done) {

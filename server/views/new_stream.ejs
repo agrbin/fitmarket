@@ -2,12 +2,25 @@
 
 <p><%= message %></p>
 
-<% if (!has_google || !has_fitbit) { %>
-  <p>Moras biti logiran sa googl-om i jednim od {fitbit, googleFit}.<p>
+<% if (existing_stream) { %>
+<font color="red">Pozor!</font><ul>
+<li>
+  Tvoj korisnik vec ima stream podataka na provideru
+  <%= existing_stream.provider %>.<br/>
+  Ime: <%= existing_stream.stream_name %><br/>
+  Latest weight: <%= existing_stream.latest_weight %><br/>
+  Promjena je razumna u slucaju:
+  <ul>
+    <li>reaktivacije izgubljenog tokena</li>
+    <li>mijenjanje korisnika na provideru</li>
+    <li>mijenjanje providera podataka</li>
+  </ul>
+  </li>
+</ul>
 <% } %>
 
-<% if (!has_google) { %>
-  <a href="/google/init/">login with google</a><br/>
+<% if (!has_googlefit && !has_fitbit) { %>
+  <p>Za nastaviti, logiraj se s jednim od {fitbit, googleFit}.<p>
 <% } %>
 
 <% if (!has_googlefit) { %>
@@ -18,7 +31,7 @@
   <a href="/fitbit/init/">login with fitbit</a><br/>
 <% } %>
 
-<% if (has_google && (has_fitbit | has_googlefit)) { %>
+<% if (has_fitbit | has_googlefit) { %>
   <br/>
   <form action="/new_stream/submit" method="post">
     Potvrdi da zelis preuzeti podatke:
@@ -40,10 +53,19 @@
     </label>
     <% } %>
 
-    <label>
-      Daj nadimak tvojim dionicama. Obicno koristimo kod od 4 velika slova (npr GOOG).<br/>
-      <input type="text" name="name" />
-    </label>
+    <% if (!existing_stream) { %>
+      <label>
+        Daj nadimak tvojim dionicama. Obicno koristimo kod od 4 velika slova (npr GOOG).<br/>
+        <input name="name" type="text" />
+      </label>
+    <% } else { %>
+      <label>
+        Napomena: mijenjas svoj postojeci stream.
+        <input name="name"
+            type="hidden"
+            value="<%=existing_stream.stream_name%>"/>
+      </label>
+    <% } %>
 
     </br></br>
     <input type="submit" value="submit" />

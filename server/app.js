@@ -77,6 +77,10 @@ function setUpAuth() {
       req.session.google = clone(req.session.passport.user);
       // Doesn't work. It looks like passport reinitializes the session when
       // logging-in for the first time.
+      // NOTE(ganton): It actually works. The hazard I observed before was when
+      // the domain changes from fm.xfer.hr to fitmarket.xfer.hr. I changed the
+      // front web server now to resolve this on its own and to send request to
+      // node app only on full domains (fitmarket and fitmarket.sandbox).
       res.redirect(req.session.returnTo || "/main");
     }
   );
@@ -233,8 +237,9 @@ app.post("/main/personal/update", mainMid, main.personalUpdate);
 app.post("/main/personal/submit", mainMid, main.submitTransaction);
 
 // NEW STREAM
-app.get("/new_stream", new_stream.landing);
-app.post("/new_stream/submit", new_stream.submit);
+var newStreamMid = mainMid.concat([new_stream.populateMyStream]);
+app.get("/new_stream", newStreamMid, new_stream.landing);
+app.post("/new_stream/submit", newStreamMid, new_stream.submit);
 
 // API
 app.get("/main/api_token", mainMid, main.apiToken);
