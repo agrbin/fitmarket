@@ -232,78 +232,8 @@ function saveStreamData(stream, done) {
   ], done);
 }
 
-function getReadingsForStreamGoogleFit(stream, done) {
-  googleApisClient.setCredentials({
-    access_token: stream.access_token,
-    refresh_token: stream.refresh_token,
-  });
-  googleApisClient.refreshAccessToken(function(err, token) {
-    if (err) {
-      return done(err);
-    }
-    console.log("new token for " +
-                stream.stream_name + ": " + JSON.stringify(token));
-    stream.access_token = token.access_token;
-    saveStreamData(stream, done);
-    db.updateAccessToken(
-      stream.stream_id,
-      token.access_token,
-      token.refresh_token, function (err) {
-        if (err) {
-          console.log("  Failed to write new access token: ", err);
-        } else {
-          console.log("  New access/refresh token written for ",
-            stream.stream_name);
-        }
-      });
-  });
-}
-
-function getReadingsForStream(stream, done) {
-  if (stream.provider === "googlefit") {
-    return getReadingsForStreamGoogleFit(stream, done);
-  }
-
-  // STEP 1, update access token.
-  fitbitClient.refreshAccessToken(
-    stream.access_token,
-    stream.refresh_token)
-  .nodeify(function (err, token) {
-    if (err) {
-      return done(err);
-    }
-    console.log("new token for " +
-                stream.stream_name + ": " + JSON.stringify(token));
-    stream.access_token = token.access_token;
-    saveStreamData(stream, done);
-    // Save the new token to db.
-    db.updateAccessToken(
-      stream.stream_id,
-      token.access_token,
-      token.refresh_token, function (err) {
-        if (err) {
-          console.log("  Failed to write new access token: ", err);
-        } else {
-          console.log("  New access/refresh token written for ",
-            stream.stream_name);
-        }
-      });
-  });
-}
-
-module.exports.getReadings = function (done) {
-  var stream_credentials = [];
-
-  db.getStreamCredentials(function (err, stream) {
-    if (err) {
-      return done(err);
-    }
-    stream_credentials.push(stream);
-  }, function (err) {
-    if (err) {
-      return done(err);
-    }
-    console.log("Needs to process " + stream_credentials.length + " streams.");
-    async.eachSeries(stream_credentials, getReadingsForStream, done);
-  });
+// gets list of valid streams.
+module.exports.getReadings = function (stream_credentials, done) {
+  console.log("Needs to process " + stream_credentials.length + " streams.");
+  async.eachSeries(stream_credentials, saveStreamData, done);
 };
