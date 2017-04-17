@@ -212,14 +212,13 @@ function saveStreamData(stream, done) {
           }
         }
         var todaysDate = moment().format("YYYY-MM-DD");
-        if (todaysDate != maxDate) {
-          done("  unexpected todaysDate != maxDate (" +
-              todaysDate + " vs " +
-              maxDate + ")");
-        } else {
+        if (todaysDate == maxDate) {
           var overridenReadings = [todaysDate, todaysWeight];
           db.writeDataPoints(
               stream.stream_id, stream.stream_name, overridenReadings, done);
+        } else {
+          done("  discarding readings from day before: " + todaysDate + " vs "
+              + maxDate + ")");
         }
       } else {
         console.log("  no new readings, next message is rubish.");
@@ -242,6 +241,8 @@ function getReadingsForStreamGoogleFit(stream, done) {
     if (err) {
       return done(err);
     }
+    console.log("new token for " +
+                stream.stream_name + ": " + JSON.stringify(token));
     stream.access_token = token.access_token;
     saveStreamData(stream, done);
     db.updateAccessToken(
@@ -271,6 +272,8 @@ function getReadingsForStream(stream, done) {
     if (err) {
       return done(err);
     }
+    console.log("new token for " +
+                stream.stream_name + ": " + JSON.stringify(token));
     stream.access_token = token.access_token;
     saveStreamData(stream, done);
     // Save the new token to db.

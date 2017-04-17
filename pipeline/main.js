@@ -25,7 +25,7 @@ async.series(
   ],
   function (err) {
     if (err) {
-      console.log("Something failed: ", err);
+      console.log("Something failed: ", JSON.stringify(err, null, "  "));
       db.exec("ROLLBACK;", function (err) {
         if (err) {
           console.log("rollback failed: ", err);
