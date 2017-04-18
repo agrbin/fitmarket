@@ -20,6 +20,11 @@ else
   exit 1
 fi
 
+if [ -f $root/pipeline/log.txt ]; then
+  echo $root/pipeline/log.txt exists, delete it first.
+  exit 1
+fi
+
 echo running service fitmarket stop..
 sudo service fitmarket stop
 

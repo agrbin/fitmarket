@@ -213,7 +213,7 @@ function saveStreamData(stream, done) {
         }
         var todaysDate = moment().format("YYYY-MM-DD");
         if (todaysDate == maxDate) {
-          var overridenReadings = [todaysDate, todaysWeight];
+          var overridenReadings = [[todaysDate, todaysWeight]];
           db.writeDataPoints(
               stream.stream_id, stream.stream_name, overridenReadings, done);
         } else {
