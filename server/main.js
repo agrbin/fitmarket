@@ -7,13 +7,14 @@ var express = require("express"),
 
 var topTraders = new TopTraders(db);
 
-module.exports.landing = function (req, res) {
+function render(page, req, res) {
   res.js_payload.actual = req.actual;
   res.js_payload.user = req.user;
   res.js_payload.enableSelfShares = config.enableSelfShares;
+  res.js_payload.page = page;
 
-  res.render("main", {
-    page : "main",
+  res.render("page_" + page, {
+    page : page,
     user : req.user,
     top_traders : topTraders.getResult(),
     session : JSON.stringify(req.session),
@@ -22,6 +23,14 @@ module.exports.landing = function (req, res) {
     opportunity_intervals : config.opportunityIntervals,
     opportunities : topTraders.getOpportunities(),
   });
+}
+
+module.exports.market = function (req, res) {
+  render("market", req, res);
+};
+
+module.exports.personal = function (req, res) {
+  render("personal", req, res);
 };
 
 module.exports.totalMoney = function (req, res) {
@@ -51,7 +60,7 @@ module.exports.personalUpdate = function (req, res) {
     if (err) {
       return res.error(err);
     }
-    res.redirect("/main#personal");
+    res.redirect("/main_personal");
   });
 };
 
@@ -158,7 +167,7 @@ module.exports.submitTransaction = function (req, res) {
           if (err) {
             return res.error(err);
           }
-          res.redirect("/main#personal");
+          res.redirect("/main_personal");
         });
     }
   );

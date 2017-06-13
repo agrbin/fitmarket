@@ -1,3 +1,4 @@
+<%- include _functions.ejs %>
 <!doctype html>
 <html class="no-js" lang="">
   <head>
@@ -10,23 +11,33 @@
     <meta http-equiv="cleartype" content="on">
 
     <link rel="stylesheet" href="//necolas.github.io/normalize.css/5.0.0/normalize.css">
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="common.css">
 
     <link rel="stylesheet"
     href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <!-- Note
+    https://stackoverflow.com/questions/10214083/how-to-bind-mobileinit-event-in-jquery-mobile -->
+    <script src="common.js"></script>
     <script
       src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 
     <script src="dygraph.min.js"></script>
+    <script src="page_<%= page %>.js"></script>
     <link rel="stylesheet" src="dygraph.min.css" />
-
-    <script src="main.js"></script>
 
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="apple-touch-icon.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="apple-touch-icon.png">
     <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-precomposed.png">
     <link rel="shortcut icon" href="favicon.ico" />
-
+    <script>
+      var js_payload = <%- js_payload %>;
+      for (var key in {error:0, info:0}) {
+        for (var i = 0; i < js_payload[key].length; ++i) {
+          console.log(key + ":", js_payload[key][i]);
+        }
+      }
+    </script>
   </head>
   <body>

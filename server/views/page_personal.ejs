@@ -1,105 +1,110 @@
-<% if (user.user_name == "changeme") { %>
+<%- include _head.ejs %>
 
-<div class="ui-body ui-body-a">
-  <form action="/main/personal/update" method="post">
-    <label for="presonal_user_name">Change your name:</label>
-    <input
-      type="text"
-      name="personal_user_name"
-      id="text-basic"
-      value="<%= user.user_name %>">
-    <input type="submit" value="Change">
-  </form>
-</div>
+<div data-role="page" id="personal">
 
-<% } %>
-
-<div class="ui-corner-all">
-  <div class="ui-bar ui-bar-a">
-    <h3>Moje stanje</h3>
-    <span class="time-span-buttons">
-    <a
-      class="ui-btn ui-corner-all ui-btn-inline ui-mini"
-      href="https://docs.google.com/document/d/1LqvWid4Z49lMdD8WBkmFfbinDf7fKoZCZGTMIMMVt_Q/edit" target="_blank">
-      pomoć
-    </a>
-    </span>
-  </div>
+  <% if (user.user_name == "changeme") { %>
   <div class="ui-body ui-body-a">
-    <table
-      data-role="table"
-      class="table-stroke ui-responsive"
-      data-mode="columntoggle"
-      id="details">
-      <thead>
-        <tr>
-          <th data-priority="1"></th>
-          <th data-priority="2"></th>
-          <th data-priority="1"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th>Ukupna vrijednost</th>
-          <td></td>
-          <td><span class="value"><%= formatValue(user.total_money) %></span></td>
-        </tr>
-        <tr class="free_money">
-          <td>Neinvestirano</td>
-          <td></td>
-          <td><span class="value"><%= formatValue(user.free_money) %></span></td>
-        </tr>
-
-        <% for (var stream_id in actual) { %>
-          <tr class="share_row" data-stream_id="<%= stream_id %>">
-            <td class="name"></td>
-            <td class="count">
-              <span class="value latest_weight"></span>
-              *
-              <span class="how_many"></span>
-            </td>
-            <td><span class="value total_value">
-            </span></td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
+    <form action="/main/personal/update" method="post">
+      <label for="presonal_user_name">Change your name:</label>
+      <input
+        type="text"
+        name="personal_user_name"
+        id="text-basic"
+        value="<%= user.user_name %>">
+      <input type="submit" value="Change">
+    </form>
   </div>
-</div>
+  <% } %>
 
-<div class="ui-corner-all">
-  <div class="ui-bar">
-    <div data-role="controlgroup" data-type="horizontal" class="my-center">
-      <a href="#" class="ui-btn show-sth show-buy">Kupi</a>
-      <a href="#" class="ui-btn show-sth show-sell">Prodaj</a>
+  <div class="ui-corner-all">
+    <div class="ui-bar ui-bar-a">
+      <h3>Moje stanje</h3>
+      <span class="time-span-buttons">
+      <a
+        class="ui-btn ui-corner-all ui-btn-inline ui-mini"
+        href="https://docs.google.com/document/d/1LqvWid4Z49lMdD8WBkmFfbinDf7fKoZCZGTMIMMVt_Q/edit" target="_blank">
+        pomoć
+      </a>
+      </span>
+    </div>
+    <div class="ui-body ui-body-a">
+      <table
+        data-role="table"
+        class="table-stroke ui-responsive"
+        data-mode="columntoggle"
+        id="details">
+        <thead>
+          <tr>
+            <th data-priority="1"></th>
+            <th data-priority="2"></th>
+            <th data-priority="1"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Ukupna vrijednost</th>
+            <td></td>
+            <td><span class="value"><%= formatValue(user.total_money) %></span></td>
+          </tr>
+          <tr class="free_money">
+            <td>Neinvestirano</td>
+            <td></td>
+            <td><span class="value"><%= formatValue(user.free_money) %></span></td>
+          </tr>
+
+          <% for (var stream_id in actual) { %>
+            <tr class="share_row" data-stream_id="<%= stream_id %>">
+              <td class="name"></td>
+              <td class="count">
+                <span class="value latest_weight"></span>
+                *
+                <span class="how_many"></span>
+              </td>
+              <td><span class="value total_value">
+              </span></td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
     </div>
   </div>
-  <div class="ui-body ui-body-a buy-sell-form">
 
-    <form action="/main/personal/submit" method="post">
-      <input type="hidden" class="which_action" name="action" value="buy"/> 
-
-      <select name="stream" class="select_stream">
-        <option value="" disabled selected>Odaberi dionicu</option>
-        <% for (var stream_id in actual) { %>
-          <option value="<%= stream_id %>">
-            <%= actual[stream_id].stream_name %>
-            (<%= formatValue(actual[stream_id].latest_weight) %> kg)
-          </option>
-        <% } %>
-      </select>
-
-
-      <div class="slider-container">
-        <label for="count">Broj dionica:</label>
-        <input type="range" name="count" id="count"
-          value="1" min="1" max="100" step="1"
-          data-highlight="true">
-
-        <input type="submit" data-theme="b" value="Izvrši">
+  <div class="ui-corner-all">
+    <div class="ui-bar">
+      <div data-role="controlgroup" data-type="horizontal" class="my-center">
+        <a href="#" class="ui-btn show-sth show-buy">Kupi</a>
+        <a href="#" class="ui-btn show-sth show-sell">Prodaj</a>
       </div>
+    </div>
+    <div class="ui-body ui-body-a buy-sell-form">
 
-    </form>
+      <form action="/main/personal/submit" method="post">
+        <input type="hidden" class="which_action" name="action" value="buy"/> 
 
+        <select name="stream" class="select_stream">
+          <option value="" disabled selected>Odaberi dionicu</option>
+          <% for (var stream_id in actual) { %>
+            <option value="<%= stream_id %>">
+              <%= actual[stream_id].stream_name %>
+              (<%= formatValue(actual[stream_id].latest_weight) %> kg)
+            </option>
+          <% } %>
+        </select>
+
+
+        <div class="slider-container">
+          <label for="count">Broj dionica:</label>
+          <input type="range" name="count" id="count"
+            value="1" min="1" max="100" step="1"
+            data-highlight="true">
+
+          <input type="submit" data-theme="b" value="Izvrši">
+        </div>
+
+      </form>
+
+    </div>
   </div>
 </div>
+
+<%- include _foot.ejs %>

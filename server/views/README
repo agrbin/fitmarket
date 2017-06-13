@@ -1,0 +1,7 @@
+Naming convention:
+
+- page_* are pages that use jquery-mobile framework. Those files always include _* files.
+
+- _* files are files included from most of the other files.
+
+- landing.ejs and new_stream.ejs are basic HTML pages
