@@ -75,18 +75,22 @@ div#plot-overlay {
 
 div#legend {
   margin-top: 4px;
-  text-align: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
 }
 
-div#legend span.hide {
-  opacity: 0.3;
-}
-
-div#legend span {
+div#legend div {
   cursor: default;
   font-size: small;
   font-weight: bold;
-  display: inline;
-  white-space: nowrap;
-  margin-left: 15px;
+  flex: 0 0 5px;
+  margin: 5px 5px;
 }
+
+div#legend div.hide {
+  opacity: 0.3;
+}
+

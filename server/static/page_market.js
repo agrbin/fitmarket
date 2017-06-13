@@ -95,7 +95,7 @@ $(function () {
         continue;
       }
       if (name.charAt(0) != '~') {
-        $("<span></span>")
+        $("<div></div>")
           .css("color", prop.color)
           .data("id", plot.indexFromSetName(name) - 1)
           .data("name", name)
@@ -106,7 +106,7 @@ $(function () {
       }
     }
     // get all series, colors and ids.
-    $("div#legend span").click(function (e) {
+    $("div#legend div").click(function (e) {
       e.preventDefault();
       var id = $(this).data("id");
       $(this).toggleClass("hide");

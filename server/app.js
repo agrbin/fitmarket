@@ -234,6 +234,7 @@ app.get("/main/total_money_plot_txt", mainMid, main.total_money_path_txt);
 app.get("/main", mainMid, main.market);
 app.get("/main_market", mainMid, main.market);
 app.get("/main_personal", mainMid, main.personal);
+app.get("/main_total_money", mainMid, main.totalMoney);
 app.get("/total_money", mainMid, main.totalMoney);
 app.post("/main/personal/update", mainMid, main.personalUpdate);
 app.post("/main/personal/submit", mainMid, main.submitTransaction);

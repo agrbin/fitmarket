@@ -3,6 +3,7 @@
 $(function () {
   var plot = null;
   var current = js_payload.page;
+  var originalRange = null;
 
   function initializePlot() {
     var options = {
@@ -16,6 +17,7 @@ $(function () {
         strokeBorderWidth: 2,
         highlightCircleSize: 5
       },
+      labelsKMB : true,
       strokeWidth : 1,
       labelsSeparateLines: false,
       highlightCircleSize : 2,
@@ -41,8 +43,6 @@ $(function () {
   }
 
   initializePlot();
-
-  var originalRange = null;
 
   // Stock time-range buttons.
   function activate() {
@@ -73,51 +73,45 @@ $(function () {
     plot.updateOptions(opt);
   }
 
-  function setUpZoomButtons() {
-    if (originalRange !== null) {
+  function setUpZoomButtons(devnull, is_initial) {
+    if (!is_initial) {
       return;
     }
-    for (var i = 0; i < plot.getLabels().length; ++i) {
-      var name = plot.getLabels()[i];
+    originalRange = plot.xAxisRange();
+    var visible = [];
+    for (var i = 0; i < js_payload.top_traders.length; ++i) {
+      var name = js_payload.top_traders[i].user_name;
       var prop = plot.getPropertiesForSeries(name);
-      if (name == "date") {
-        continue;
+      var id = plot.indexFromSetName(name) - 1;
+      var div = $("<div></div>");
+      div
+        .css("color", prop.color)
+        .data("id", id)
+        .data("name", name)
+        .attr('unselectable', 'on')
+        .css('user-select', 'none')
+        .on('selectstart', false)
+        .text(name);
+      if (i >= 5) {
+        div.addClass("hide");
+        visible[id] = false;
+      } else {
+        visible[id] = true;
       }
-      if (name.charAt(0) != '~') {
-        $("<span></span>")
-          .css("color", prop.color)
-          .data("id", plot.indexFromSetName(name) - 1)
-          .data("name", name)
-          .attr('unselectable', 'on')
-          .css('user-select', 'none')
-          .on('selectstart', false)
-          .text(name).appendTo($("div#legend"));
-      }
+      div.appendTo($("div#legend"));
     }
+    plot.setVisibility(visible);
     // get all series, colors and ids.
-    $("div#legend span").click(function (e) {
+    $("div#legend div").click(function (e) {
       e.preventDefault();
       var id = $(this).data("id");
       $(this).toggleClass("hide");
       plot.setVisibility(id, !$(this).hasClass("hide"));
     });
-    originalRange = plot.xAxisRange();
     $(".plot-btn.time-span-buttons a").click(activate);
     activate.call($(".plot-btn a.initial")[0]);
   }
 
-  // toplist period navigation
-  function activateToplist() {
-    $(".toplist-btn.time-span-buttons a").removeClass("ui-btn-active");
-    $(this).addClass("ui-btn-active");
-    $(this).blur();
-    var span_str = $(this).text().trim();
-    $(".toplist-div").hide();
-    $(".toplist-div." + span_str).show();
-  }
-
-  $(".toplist-div").hide();
-  $(".toplist-btn.time-span-buttons a").click(activateToplist);
-  activateToplist.call(
-    $(".toplist-btn.time-span-buttons a:contains(3d)")[0]);
+  (function () {
+  })();
 });

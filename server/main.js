@@ -12,11 +12,12 @@ function render(page, req, res) {
   res.js_payload.user = req.user;
   res.js_payload.enableSelfShares = config.enableSelfShares;
   res.js_payload.page = page;
+  res.js_payload.top_traders = topTraders.getResult();
 
   res.render("page_" + page, {
     page : page,
     user : req.user,
-    top_traders : topTraders.getResult(),
+    top_traders : res.js_payload.top_traders,
     session : JSON.stringify(req.session),
     actual : req.actual,
     js_payload : JSON.stringify(res.js_payload),
@@ -34,15 +35,7 @@ module.exports.personal = function (req, res) {
 };
 
 module.exports.totalMoney = function (req, res) {
-  res.js_payload.actual = req.actual;
-  res.js_payload.user = req.user;
-  res.js_payload.enableSelfShares = config.enableSelfShares;
-
-  res.render("total_money", {
-    user : req.user,
-    page : "total-money",
-    js_payload : JSON.stringify(res.js_payload),
-  });
+  render("total_money", req, res);
 };
 
 module.exports.path_txt = function (req, res) {
