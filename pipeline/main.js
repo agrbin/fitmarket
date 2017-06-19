@@ -53,9 +53,9 @@ refresh_tokens.refreshTokens(function (err, valid_streams) {
       get_readings.getReadings(valid_streams, done);
     },
     update_plot.updatePlot,
-    update_plot.updateTotalMoneyPlot,
     update_latest.updateLatest,
     update_total_money.updateTotalMoney,
+    update_plot.updateTotalMoneyPlot,
     update_opportunity.updateOpportunity,
   ]);
 });
