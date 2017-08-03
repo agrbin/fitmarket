@@ -183,7 +183,18 @@ function getUserFromDb(req, res, next) {
     }
     req.user = user;
     parseShares(req);
-    next();
+    // We can initialize the api token here.
+    if (user.api_token === null) {
+      db.resetToken(user.user_id, function (err, new_token) {
+        if (err) {
+          return res.error(err);
+        }
+        user.api_token = new_token;
+        next();
+      });
+    } else {
+      next();
+    }
   });
 }
 
