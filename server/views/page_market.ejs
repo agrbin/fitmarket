@@ -1,6 +1,8 @@
 <%- include _head.ejs %>
 
 <div data-role="page" id="market">
+
+  <!-- graph -->
   <div class="ui-corner-all">
     <div class="ui-bar ui-bar-a">
       <h3>Stanje dionica</h3>
@@ -21,6 +23,7 @@
     </div>
   </div>
 
+  <!-- top traders -->
   <div class="ui-corner-all">
     <div class="ui-bar ui-bar-a">
       <h3>Top traders</h3>
@@ -56,6 +59,7 @@
     </div>
   </div>
 
+  <!-- top recent traders -->
   <div class="ui-corner-all">
     <div class="ui-bar ui-bar-a">
       <h3>Top recent traders</h3>
@@ -140,6 +144,58 @@
     </div>
     <% } %>
   </div>
+
+  <!-- fast market -->
+  <div class="ui-corner-all">
+    <div class="ui-bar ui-bar-a">
+      <h3>Brzo trgovanje<span class="fastmarket-loading">...</span></h3>
+    </div>
+    <div class="ui-body ui-body-a">
+      <div class="fastmarket-container">
+        <div class="narrative">
+          <p>
+            <% if (fast_market_compatible) { %>
+              Cjelokupni kapital ulaže se na jednake djelove.
+            <% } else { %>
+              Trenutni ulozi nisu kompatibilni sa brzim trgovanjem.
+            <% } %>
+          </p>
+        </div>
+        <% if (fast_market_compatible) { %>
+        <% for (var streamId in actual) { %>
+        <% if (streamId[0] != '~') { %>
+        <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+          <label class="title" id="stock-<%= actual[streamId].stream_name %>">
+            <%= actual[streamId].stream_name %>
+            <input type="radio"
+              style="display: none;"
+              class="title-input"
+              name="<%= actual[streamId].stream_name %>">
+          </label>
+          <label>gore &uarr;
+            <input type="radio"
+              class="updown"
+              name="<%= actual[streamId].stream_name %>"
+              value="up"
+              <%= fast_market_bids[streamId] ? 'checked=checked' : '' %>
+              >
+          </label>
+          <label>dole &darr;
+            <input type="radio"
+              class="updown"
+              name="<%= actual[streamId].stream_name %>"
+              value="down"
+              <%= fast_market_bids['~' + streamId] ? 'checked=checked' : '' %>
+              >
+          </label>
+        </fieldset>
+        <% } %>
+        <% } %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <%- include _foot.ejs %>

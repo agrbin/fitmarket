@@ -81,9 +81,9 @@ CREATE TABLE stream_data (
 );
 
 /*
- * At 'date_time' user 'user_id' executed 'action' (BUY/SELL) on
- * stream 'stream_user_id' on 'count' shares, and the value at that time was
- * 'stream_weight'.
+ * At 'date_time' user 'user_id' executed 'action'
+ * (buy/sell/sell_all/fastmarket) on stream 'stream_user_id' on 'count' shares,
+ * and the value at that time was 'stream_weight'.
  * This table is a pure log table, we don't read from it from the application.
  *
  * 'action' is "SELL" or "BUY".

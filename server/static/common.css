@@ -94,3 +94,37 @@ div#legend div.hide {
   opacity: 0.3;
 }
 
+/* --------------- fastmarket ----------------- */
+
+div .fastmarket-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+div .fastmarket-container label.title {
+  width: 60px;
+  background-color: white;
+  text-align: center;
+}
+
+div .fastmarket-container label.hide {
+  opacity: 0.3;
+}
+
+div .fastmarket-container label.title:hover {
+  background-color: white;
+  cursor: default;
+}
+
+div .fastmarket-container .narrative {
+  font-size: small;
+  color: gray;
+}
+
+div .fastmarket-container .invalid.narrative {
+  display: none;
+}
+
+.fastmarket-loading {
+  display: none;
+}

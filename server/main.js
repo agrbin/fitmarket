@@ -2,6 +2,7 @@ var express = require("express"),
   path = require("path"),
   config = require("../common/config.js"),
   moment = require("moment"),
+  fast_market = require("./fast_market.js"),
   db = new (require("../common/db.js").Db)(),
   TopTraders = require("./top_traders.js").TopTraders;
 
@@ -14,9 +15,14 @@ function render(page, req, res) {
   res.js_payload.page = page;
   res.js_payload.top_traders = topTraders.getResult();
 
+  fast_market_bids = fast_market.isFastMarketCompatible(
+      req.user, req.actual);
+
   res.render("page_" + page, {
     page : page,
     user : req.user,
+    fast_market_compatible : fast_market_bids !== false,
+    fast_market_bids : fast_market_bids,
     top_traders : res.js_payload.top_traders,
     session : JSON.stringify(req.session),
     actual : req.actual,
@@ -280,4 +286,37 @@ module.exports.apiSellAll = function (req, res) {
     res.send("submitted!\n");
   });
 };
+
+// bids set is input, keys are stock names, not ids.
+// returns bids that are now set for the user.
+module.exports.apiFastSubmit = function (req, res) {
+  var bids = fast_market.validateFastSubmitRequest(req.body, req.actual);
+  if (bids === false) {
+    return res.error("coudln't parse request.");
+  }
+
+  var new_shares = fast_market.getFastMarketShares(req.user, req.actual, bids);
+  var free_money = fast_market.getFreeMoney(req.user, req.actual, new_shares);
+  free_money = roundTo1(free_money);
+
+  db.applyTransaction({
+    user_id : req.user.user_id,
+    new_shares : new_shares,
+    new_free_money : free_money,
+    datetime: moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
+    action: "fastmarket",
+    stream_id: null,
+    count: null,
+    stream_name: null,
+    stream_weight: null,
+    user_name : req.user.user_name,
+    is_api: 1,
+  }, function (err) {
+    if (err) {
+      return res.error(err);
+    }
+    res.json(req.body);
+  });
+};
+
 

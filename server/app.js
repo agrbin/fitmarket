@@ -236,6 +236,7 @@ app.get("/main_market", mainMid, main.market);
 app.get("/main_personal", mainMid, main.personal);
 app.get("/main_total_money", mainMid, main.totalMoney);
 app.get("/total_money", mainMid, main.totalMoney);
+
 app.post("/main/personal/update", mainMid, main.personalUpdate);
 app.post("/main/personal/submit", mainMid, main.submitTransaction);
 
@@ -253,6 +254,7 @@ app.get("/api/mystate", apiMid, main.apiMyState);
 app.get("/api/actual_state", apiMid, main.apiActualState);
 app.post("/api/submit", apiMid, main.apiSubmit);
 app.post("/api/sell_all", apiMid, main.apiSellAll);
+app.post("/api/fast_submit", apiMid, main.apiFastSubmit);
 
 app.listen(config.port, function () {
   console.log("Listening on port ", config.port);

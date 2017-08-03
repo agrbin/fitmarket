@@ -103,6 +103,9 @@ $(function () {
           .css('user-select', 'none')
           .on('selectstart', false)
           .text(name).appendTo($("div#legend"));
+        // hack: change colors in fastmarket container
+        $(".fastmarket-container #stock-" + name)
+          .css("color", prop.color);
       }
     }
     // get all series, colors and ids.
@@ -132,3 +135,83 @@ $(function () {
     $(".toplist-btn.time-span-buttons a:contains(3d)")[0]);
 });
 
+// fastmarket implementation
+$(function () {
+  function getBids() {
+    var result = {};
+    $(".fastmarket-container input.updown:checked").each(function (i, e) {
+      var stream_id = $(e).attr("name");
+      var val = $(e).val();
+      if (val == "down") {
+        result["~" + stream_id] = "1";
+      } else if (val == "up") {
+        result[stream_id] = "1";
+      } else {
+        throw ("unexpected value: " + val);
+      }
+    });
+    return result;
+  }
+
+  var in_flight = 0;
+  var latest_response = null;
+  var latest_sent = getBids();
+  grayOut(latest_sent);
+
+  function onProcessed(response) {
+    latest_response = response;
+  }
+
+  function bidsEq(bids1, bids2) {
+    return JSON.stringify(bids1) === JSON.stringify(bids2);
+  }
+
+  // Takes bids as input and grays out titles (left buttons) that are not
+  // invested.
+  function grayOut(bids) {
+    $(".fastmarket-container label.title").addClass("hide");
+    for (var stream_id in bids) {
+      if (stream_id[0] == '~') {
+        stream_id = stream_id.substr(1);
+      }
+      $(".fastmarket-container label.title#stock-" +
+          stream_id).removeClass("hide");
+    }
+  }
+
+  // Starts the submit process. Can exit early if last latest_sent is equal to
+  // current state.
+  function initSubmit() {
+    var bids = getBids();
+    if (bidsEq(bids, latest_sent)) {
+      // don't send the same request twice.
+      return;
+    }
+    grayOut(bids);
+    ++in_flight;
+    latest_sent = bids;
+    $(".fastmarket-loading").show();
+    $.post(
+      "/api/fast_submit?token=" + js_payload.user.api_token,
+      bids, onProcessed, "json")
+    .always(function () {
+      --in_flight;
+      if (in_flight == 0) {
+        $(".fastmarket-loading").hide();
+        if (JSON.stringify(latest_response) !== JSON.stringify(getBids())) {
+          console.log(
+            JSON.stringify(latest_response),
+            JSON.stringify(getBids()));
+          alert("something went wrong with the UI. reloading the page");
+          document.location = document.location;
+        }
+      }
+    });
+  }
+
+  $(".fastmarket-container .title-input").click(function () {
+    $(this).attr("checked", false);
+  });
+
+  $(".fastmarket-container input").click(initSubmit);
+});
