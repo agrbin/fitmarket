@@ -60,7 +60,7 @@ function isFastMarketCompatible(user, actual) {
   }
 }
 
-module.exports.validateFastSubmitRequest = function (body, actual) {
+module.exports.validateFastSubmitRequest = function (body, user, actual) {
   var dict = {};
   for (var stream_id in actual) {
     dict[actual[stream_id].stream_name] = stream_id;
@@ -77,6 +77,15 @@ module.exports.validateFastSubmitRequest = function (body, actual) {
       return false;
     }
     result[dict[stream_name]] = 1;
+  }
+  // Can't buy self shares!
+  if (!config.enableSelfShares) {
+    for (var id in result) {
+      if (id == user.user_id) {
+        console.log("fast_market: tried to buy your own.");
+        return false;
+      }
+    }
   }
   for (var id in result) {
     if (("~" + id) in result) {

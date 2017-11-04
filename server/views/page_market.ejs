@@ -164,6 +164,8 @@
         <% if (fast_market_compatible) { %>
         <% for (var streamId in actual) { %>
         <% if (streamId[0] != '~') { %>
+        <% if (js_payload.enableSelfShares ||
+               streamId != user.user_id) { %>
         <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
           <label class="title" id="stock-<%= actual[streamId].stream_name %>">
             <%= actual[streamId].stream_name %>
@@ -189,6 +191,7 @@
               >
           </label>
         </fieldset>
+        <% } %>
         <% } %>
         <% } %>
         <% } %>

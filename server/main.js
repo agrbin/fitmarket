@@ -290,7 +290,7 @@ module.exports.apiSellAll = function (req, res) {
 // bids set is input, keys are stock names, not ids.
 // returns bids that are now set for the user.
 module.exports.apiFastSubmit = function (req, res) {
-  var bids = fast_market.validateFastSubmitRequest(req.body, req.actual);
+  var bids = fast_market.validateFastSubmitRequest(req.body, req.user, req.actual);
   if (bids === false) {
     return res.error("coudln't parse request.");
   }
