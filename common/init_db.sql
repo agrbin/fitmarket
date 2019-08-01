@@ -31,6 +31,12 @@
  * best_cost is the best possible total money that user could raised given the
  * stock movements.
  *
+ * - api_token (FW), a string that is used with API.
+ *
+ * - ui_defaults (FW) a JSON object that UI manages, to store default values for
+ * visibility of UI elements. for example, if user is always looking at '3m' we
+ * should always select '3m' whenever this user logs in.
+ *
  */
 DROP TABLE IF EXISTS user;
 CREATE TABLE user (
@@ -40,7 +46,8 @@ CREATE TABLE user (
   total_money DOUBLE,
   shares TEXT,
   opportunity TEXT,
-  api_token TEXT
+  api_token TEXT,
+  ui_defaults TEXT
 );
 
 /* 
