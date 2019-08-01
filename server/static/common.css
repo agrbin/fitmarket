@@ -128,3 +128,7 @@ div .fastmarket-container .invalid.narrative {
 .fastmarket-loading {
   display: none;
 }
+
+.ui-corner-all h3 {
+  cursor: default;
+}

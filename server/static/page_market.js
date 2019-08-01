@@ -135,6 +135,30 @@ $(function () {
     $(".toplist-btn.time-span-buttons a:contains(3d)")[0]);
 });
 
+// hide show sections
+$(function () {
+  $(".ui-corner-all h3").click(function () {
+    var ui_corner_all = $(this).parent().parent();
+    var visible = $(this).data("visible");
+    $(this).blur();
+    if (visible == 'yes') {
+      visible = 'no';
+      $(".ui-bar .time-span-buttons", ui_corner_all).hide();
+      $(".ui-body", ui_corner_all).hide();
+    } else {
+      visible = 'yes';
+      $(".ui-bar .time-span-buttons", ui_corner_all).show();
+      $(".ui-body", ui_corner_all).show();
+    }
+    $(this).data("visible", visible);
+  });
+
+  $(".ui-corner-all h3")
+    .attr('unselectable', 'on')
+    .css('user-select', 'none')
+    .on('selectstart', false);
+});
+
 // fastmarket implementation
 $(function () {
   function getBids() {
