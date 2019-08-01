@@ -23,42 +23,6 @@
     </div>
   </div>
 
-  <!-- top traders -->
-  <div class="ui-corner-all">
-    <div class="ui-bar ui-bar-a">
-      <h3>Top traders</h3>
-      <span class="time-span-buttons">
-      <a
-        class="ui-btn ui-corner-all ui-btn-inline ui-mini"
-        href="/main_total_money">
-        plot it!
-      </a>
-      </span>
-    </div>
-    <div class="ui-body ui-body-a toplist">
-      <table
-        data-role="table"
-        class="table-stroke ui-responsive"
-        data-mode="columntoggle"
-        id="details">
-        <thead>
-          <tr>
-            <th>Trader</th>
-            <th>Vrijednost</th>
-          </tr>
-        </thead>
-        <% for (var i = 0; i < top_traders.length; ++i) { %>
-          <tr>
-            <td><%= top_traders[i].user_name %>%></td>
-            <td><%= formatValue(top_traders[i].total_money) %></td>
-          </tr>
-        <% } %>
-        <tbody>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
   <!-- top recent traders -->
   <div class="ui-corner-all">
     <div class="ui-bar ui-bar-a">
@@ -143,6 +107,42 @@
       </table>
     </div>
     <% } %>
+  </div>
+
+  <!-- top traders -->
+  <div class="ui-corner-all">
+    <div class="ui-bar ui-bar-a">
+      <h3>Top traders</h3>
+      <span class="time-span-buttons">
+      <a
+        class="ui-btn ui-corner-all ui-btn-inline ui-mini"
+        href="/main_total_money">
+        plot it!
+      </a>
+      </span>
+    </div>
+    <div class="ui-body ui-body-a toplist">
+      <table
+        data-role="table"
+        class="table-stroke ui-responsive"
+        data-mode="columntoggle"
+        id="details">
+        <thead>
+          <tr>
+            <th>Trader</th>
+            <th>Vrijednost</th>
+          </tr>
+        </thead>
+        <% for (var i = 0; i < top_traders.length; ++i) { %>
+          <tr>
+            <td><%= top_traders[i].user_name %>%></td>
+            <td><%= formatValue(top_traders[i].total_money) %></td>
+          </tr>
+        <% } %>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- fast market -->
