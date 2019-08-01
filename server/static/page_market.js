@@ -56,7 +56,7 @@ $(function () {
   var originalRange = null;
 
   // Stock time-range buttons.
-  function activate() {
+  function activate(arg) {
     $(".plot-btn.time-span-buttons a").removeClass("ui-btn-active");
     $(this).addClass("ui-btn-active");
     $(this).blur();
@@ -82,6 +82,9 @@ $(function () {
     }
     opt = {dateWindow: [now - span_ms, now]};
     plot.updateOptions(opt);
+    if (arg != "ignore_update") {
+      updateDefaultUIs("initial_plot_btn", span_str);
+    }
   }
 
   function setUpZoomButtons() {
@@ -117,42 +120,76 @@ $(function () {
     });
     originalRange = plot.xAxisRange();
     $(".plot-btn.time-span-buttons a").click(activate);
-    activate.call($(".plot-btn a.initial")[0]);
+
+    var initial_text = $(".plot-btn.time-span-buttons").data("initial");
+    activate.call($(".plot-btn.time-span-buttons a.d" + initial_text), "ignore_update");
   }
 
   // toplist period navigation
-  function activateToplist() {
+  function activateToplist(arg) {
     $(".toplist-btn.time-span-buttons a").removeClass("ui-btn-active");
     $(this).addClass("ui-btn-active");
     $(this).blur();
     var span_str = $(this).text().trim();
     $(".toplist-div").hide();
     $(".toplist-div." + span_str).show();
+    if (arg != "ignore_update") {
+      updateDefaultUIs("initial_toplist_btn", span_str);
+    }
   }
 
   $(".toplist-btn.time-span-buttons a").click(activateToplist);
-  activateToplist.call(
-    $(".toplist-btn.time-span-buttons a:contains(3d)")[0]);
+  var initial_text = $(".toplist-btn.time-span-buttons").data("initial");
+  activateToplist.call($(".toplist-btn.time-span-buttons a.d" + initial_text), "ignore_update");
 });
+
+var update_default_uis_throttle_timer = null;
+function updateDefaultUIs(key, value) {
+  js_payload.ui_defaults[key] = value;
+  // wait for 5 seconds, if another call happened in those 5 seconds cancel the
+  // current timer. this sends at most 1 request per 5 seconds.
+  clearTimeout(update_default_uis_throttle_timer);
+  update_default_uis_throttle_timer = setTimeout(
+      function () {
+        $.post(
+          "/api/update_default_uis?token=" + js_payload.user.api_token,
+          js_payload.ui_defaults);
+      }, 5000);
+}
 
 // hide show sections
 $(function () {
+  function updateVisibility(elem, arg) {
+    var ui_corner_all = $(elem).parent().parent();
+    var visible = $(elem).data("visible");
+    if (visible == 'no') {
+      $(".ui-bar .time-span-buttons", ui_corner_all).hide();
+      $(".section-wrapper", ui_corner_all).hide();
+    } else {
+      $(".ui-bar .time-span-buttons", ui_corner_all).show();
+      $(".section-wrapper", ui_corner_all).show();
+    }
+    if (arg != "ignore_update") {
+      updateDefaultUIs($(elem).data("name"), visible);
+    }
+  }
+
   $(".ui-corner-all h3").click(function () {
     var ui_corner_all = $(this).parent().parent();
     var visible = $(this).data("visible");
     $(this).blur();
     if (visible == 'yes') {
       visible = 'no';
-      $(".ui-bar .time-span-buttons", ui_corner_all).hide();
-      $(".ui-body", ui_corner_all).hide();
     } else {
       visible = 'yes';
-      $(".ui-bar .time-span-buttons", ui_corner_all).show();
-      $(".ui-body", ui_corner_all).show();
     }
     $(this).data("visible", visible);
+    updateVisibility($(this));
   });
 
+  $(".ui-corner-all h3").each(function (i, e) {
+    updateVisibility(e, "ignore_update");
+  });
   $(".ui-corner-all h3")
     .attr('unselectable', 'on')
     .css('user-select', 'none')

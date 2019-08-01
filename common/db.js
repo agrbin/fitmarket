@@ -89,6 +89,11 @@ module.exports.Db = function () {
           opportunity_str, user_id, done);
   };
 
+  this.updateDefaultUIs = function (user_id, ui_defaults_str, done) {
+    db.run("UPDATE user SET ui_defaults = ? WHERE user_id = ?;",
+          ui_defaults_str, user_id, done);
+  };
+
   this.updateTotalMoney = function (pairs, done) {
     // 1. create temp table
     // 2. populate with data
@@ -182,7 +187,7 @@ module.exports.Db = function () {
   // Returns the user's row. Initializes the user if row is still not there.
   this.getUser = function (user_id, done) {
     db.get("SELECT user_id, user_name, free_money, " +
-           "total_money, shares, api_token " +
+           "total_money, shares, api_token, ui_defaults " +
            "FROM user " +
            "WHERE user_id = ?", user_id, function (err, row) {
       if (err) {
@@ -198,7 +203,7 @@ module.exports.Db = function () {
 
   this.getUserByToken = function (token, done) {
     db.get("SELECT user_id, user_name, free_money, " +
-           "total_money, shares, api_token " +
+           "total_money, shares, api_token, ui_defaults " +
            "FROM user " +
            "WHERE api_token = ?", token, function (err, row) {
       if (err) {

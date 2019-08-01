@@ -266,6 +266,7 @@ app.get("/api/actual_state", apiMid, main.apiActualState);
 app.post("/api/submit", apiMid, main.apiSubmit);
 app.post("/api/sell_all", apiMid, main.apiSellAll);
 app.post("/api/fast_submit", apiMid, main.apiFastSubmit);
+app.post("/api/update_default_uis", apiMid, main.apiUpdateDefaultUIs);
 
 app.listen(config.port, function () {
   console.log("Listening on port ", config.port);

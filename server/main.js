@@ -8,12 +8,34 @@ var express = require("express"),
 
 var topTraders = new TopTraders(db);
 
+function parseUiDefaults(ui_defaults_str) {
+  var defaults = {
+    "section_plot_visible" : "yes",
+    "section_toptraders_visible" : "yes",
+    "section_topabstraders_visible" : "yes",
+    "section_fastmarket_visible" : "yes",
+    "initial_plot_btn" : "1w",
+    "initial_toplist_btn" : "3d",
+  }
+  var result = {};
+  var ui_defaults = JSON.parse(ui_defaults_str || "{}");
+  for (var key in defaults) {
+    if (ui_defaults.hasOwnProperty(key)) {
+      result[key] = ui_defaults[key];
+    }  else {
+      result[key] = defaults[key];
+    }
+  }
+  return result;
+}
+
 function render(page, req, res) {
   res.js_payload.actual = req.actual;
   res.js_payload.user = req.user;
   res.js_payload.enableSelfShares = config.enableSelfShares;
   res.js_payload.page = page;
   res.js_payload.top_traders = topTraders.getResult();
+  res.js_payload.ui_defaults = parseUiDefaults(req.user.ui_defaults);
 
   fast_market_bids = fast_market.isFastMarketCompatible(
       req.user, req.actual);
@@ -26,6 +48,7 @@ function render(page, req, res) {
     top_traders : res.js_payload.top_traders,
     session : JSON.stringify(req.session),
     actual : req.actual,
+    ui_defaults : parseUiDefaults(req.user.ui_defaults),
     js_payload : JSON.stringify(res.js_payload),
     opportunity_intervals : config.opportunityIntervals,
     opportunities : topTraders.getOpportunities(),
@@ -319,4 +342,15 @@ module.exports.apiFastSubmit = function (req, res) {
   });
 };
 
-
+module.exports.apiUpdateDefaultUIs = function (req, res) {
+  db.updateDefaultUIs(
+    req.user.user_id,
+    JSON.stringify(req.body),
+    function (err) {
+      if (err) {
+        return res.error(err);
+      }
+      res.json(req.body);
+    }
+  );
+};

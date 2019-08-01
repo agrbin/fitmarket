@@ -38,6 +38,7 @@ module.exports = {
     free_money : 10000,
     total_money : 10000,
     shares : "{}",
+    ui_defaults : "{}",
   },
 
   maxWeight : 150,
