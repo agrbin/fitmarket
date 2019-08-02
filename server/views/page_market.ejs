@@ -184,15 +184,6 @@
     <div class="section-wrapper">
     <div class="ui-body ui-body-a">
       <div class="fastmarket-container">
-        <div class="narrative">
-          <p>
-            <% if (fast_market_compatible) { %>
-              Cjelokupni kapital ulaže se na jednake djelove.
-            <% } else { %>
-              Trenutni ulozi nisu kompatibilni sa brzim trgovanjem.
-            <% } %>
-          </p>
-        </div>
         <% if (fast_market_compatible) { %>
         <% for (var streamId in actual) { %>
         <% if (streamId[0] != '~') { %>
@@ -227,6 +218,21 @@
         <% } %>
         <% } %>
         <% } %>
+        <div class="narrative">
+          <p>
+            <% if (fast_market_compatible) { %>
+              Cjelokupni kapital ulaže se na jednake djelove.<br/>
+              <a href="/main_personal">
+                Napredno trgovanje.
+              </a>
+            <% } else { %>
+              Trenutni ulozi nisu kompatibilni sa brzim trgovanjem.<br/>
+              <a href="/main_personal">
+                Napredno trgovanje.
+              </a>
+            <% } %>
+          </p>
+        </div>
       </div>
     </div>
     </div>

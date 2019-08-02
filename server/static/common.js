@@ -22,12 +22,3 @@ $(document).on("mobileinit", function() {
   $.mobile.ajaxEnabled = false;
 });
 
-// Select the correct navbar button.
-$(function() {
-  $( "[data-role='header'], [data-role='footer']" )
-    .toolbar();
-
-  $("." + js_payload.page)
-    .addClass("ui-btn-active")
-    .attr('href', '#');
-});

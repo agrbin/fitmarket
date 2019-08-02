@@ -242,8 +242,8 @@ var apiMid = [
 // FRONTEND
 app.get("/main/plot_txt", mainMid, main.path_txt); 
 app.get("/main/total_money_plot_txt", mainMid, main.total_money_path_txt);
+
 app.get("/main", mainMid, main.market);
-app.get("/main_market", mainMid, main.market);
 app.get("/main_personal", mainMid, main.personal);
 app.get("/main_total_money", mainMid, main.totalMoney);
 app.get("/total_money", mainMid, main.totalMoney);

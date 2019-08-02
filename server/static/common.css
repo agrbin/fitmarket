@@ -1,3 +1,9 @@
+.h3-visible-no {
+}
+
+.h3-visible-yes {
+}
+
 span.value:after {
   content: " kg";
   color: gray;

@@ -169,8 +169,16 @@ $(function () {
       $(".ui-bar .time-span-buttons", ui_corner_all).show();
       $(".section-wrapper", ui_corner_all).show();
     }
+    $(elem)
+      .removeClass("h3-visible-yes h3-visible-no")
+      .addClass("h3-visible-" + visible);
+    var name = $(elem).data("name");
+    if (name == "section_fastmarket_visible") {
+      var scrollingElement = (document.scrollingElement || document.body);
+      scrollingElement.scrollTop = scrollingElement.scrollHeight;
+    }
     if (arg != "ignore_update") {
-      updateDefaultUIs($(elem).data("name"), visible);
+      updateDefaultUIs(name, visible);
     }
   }
 
