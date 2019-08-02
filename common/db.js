@@ -351,7 +351,7 @@ module.exports.Db = function () {
   // Callback is called with each stream_credentials row in the db.
   this.getStreamCredentials = function(cb, done) {
     db.each("SELECT stream_id, stream_name, " +
-            "provider, provider_user_id, access_token, refresh_token " +
+            "provider, provider_user_id, access_token, refresh_token, latest_weight " +
             "FROM stream_credentials", cb, done);
   };
 
