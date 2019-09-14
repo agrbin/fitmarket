@@ -23,6 +23,7 @@ module.exports.landing = function (req, res) {
   var has_google = !!req.session.google;
   var has_googlefit = !!req.session.googlefit;
   var has_fitbit = !!req.session.fitbit;
+  var has_snapscale = !!req.session.snapscale;
   req.session.returnTo = "/new_stream";
 
   if (!has_google) {
@@ -34,6 +35,7 @@ module.exports.landing = function (req, res) {
     has_google: has_google,
     has_googlefit: has_googlefit,
     has_fitbit: has_fitbit,
+    has_snapscale: has_snapscale,
     existing_stream: req.myStream,
     session : JSON.stringify(req.session)
   });
@@ -44,6 +46,7 @@ module.exports.submit = function (req, res) {
   var has_googlefit = !!req.session.googlefit;
   var has_fitbit = !!req.session.fitbit;
   var has_name = !!req.body.name;
+  var has_snapscale = !!req.session.snapscale;
   var existing_stream = req.myStream;
 
   if (!has_google) {
@@ -52,7 +55,8 @@ module.exports.submit = function (req, res) {
   }
 
   if (!req.body.provider || (req.body.provider !== "googlefit" &&
-                             req.body.provider !== "fitbit")) {
+                             req.body.provider !== "fitbit" &&
+                             req.body.provider !== "snapscale")) {
     req.session.message = "klikni na kruzic.";
     return res.redirect("/new_stream");
   }
@@ -64,6 +68,11 @@ module.exports.submit = function (req, res) {
 
   if (req.body.provider == "fitbit" && !has_fitbit) {
     req.session.message = "fitbit provider ali nisi logiran sa fitbitom";
+    return res.redirect("/new_stream");
+  }
+
+  if (req.body.provider == "snapscale" && !has_snapscale) {
+    req.session.message = "snapscale provider ali nisi logiran sa snapscale";
     return res.redirect("/new_stream");
   }
 
@@ -80,9 +89,10 @@ module.exports.submit = function (req, res) {
     }
   }
 
-  var credentials = req.body.provider == "googlefit" ?
-    req.session.googlefit :
-    req.session.fitbit;
+  var credentials;
+  if (req.body.provider == "googlefit") credentials = req.session.googlefit;
+  if (req.body.provider == "fitbit") credentials = req.session.fitbit;
+  if (req.body.provider == "snapscale") credentials = req.session.snapscale;
 
   if (existing_stream) {
     db.updateExistingStream(

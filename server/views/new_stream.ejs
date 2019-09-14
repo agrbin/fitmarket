@@ -19,8 +19,18 @@
 </ul>
 <% } %>
 
-<% if (!has_googlefit && !has_fitbit) { %>
-  <p>Za nastaviti, logiraj se s jednim od {fitbit, googleFit}.<p>
+<div style="
+  padding-left: 30px;
+  border-top: 1px dashed gray;
+  border-bottom: 1px dashed gray;
+">
+
+<% if (!(has_googlefit && has_fitbit && has_snapscale)) { %>
+  <% if (has_fitbit || has_googlefit || has_snapscale) { %>
+    <p>Logiraj se s jednim od {fitbit, googleFit, SnapScale}.<p>
+  <% } else { %>
+    <p>Za nastaviti, logiraj se s jednim od {fitbit, googleFit, SnapScale}.<p>
+  <% } %>
 <% } %>
 
 <% if (!has_googlefit) { %>
@@ -31,7 +41,19 @@
   <a href="/fitbit/init/">login with fitbit</a><br/>
 <% } %>
 
-<% if (has_fitbit | has_googlefit) { %>
+<% if (!has_snapscale) { %>
+  <form action="/snapscale/callback" method="get">
+    <label>
+      Login with SnapScale CSV link:
+      <input name="snapscale_csv_url" type="text" />
+    </label>
+    <input type="submit" value="Login with snapscale!" />
+  </form>
+<% } %>
+
+</div>
+
+<% if (has_fitbit || has_googlefit || has_snapscale) { %>
   <br/>
   <form action="/new_stream/submit" method="post">
     Potvrdi da zelis preuzeti podatke:
@@ -53,9 +75,18 @@
     </label>
     <% } %>
 
+    <% if (has_snapscale) { %>
+    <label for="snapscale">
+      <p>
+        <input type="radio" name="provider" id="snapscale" value="snapscale">
+        SnapScale
+      </p>
+    </label>
+    <% } %>
+
     <% if (!existing_stream) { %>
       <label>
-        Daj nadimak tvojim dionicama. Obicno koristimo kod od 4 velika slova (npr GOOG).<br/>
+        Daj nadimak tvojim dionicama. Obicno koristimo kod od 4 velika slova (npr GOOG), a ne svoje ime.<br/>
         <input name="name" type="text" />
       </label>
     <% } else { %>

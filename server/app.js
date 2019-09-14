@@ -115,6 +115,37 @@ function setUpAuth() {
       res.redirect(req.session.returnTo || "/main");
     }
   );
+
+  // snapscale
+  app.get("/snapscale/callback",
+    function (req, res) {
+      function redirect() {
+        res.redirect(req.session.returnTo || "/main");
+      }
+      function error(msg) {
+        req.session.message = msg;
+        req.session.snapscale = null;
+        redirect();
+      }
+      var token = req.query.snapscale_csv_url;
+      var kSnapScalePrefix = "https://snapscale.life/csv?id=";
+      if (!token || !token.startsWith(kSnapScalePrefix)) {
+        return error("SnapScale login failed - URL needs" +
+          " to start with https://snapscale.life/csv?id=");
+      }
+      var id = token.substr(kSnapScalePrefix.length);
+      if (!id.match(/^[a-zA-Z0-9-]+$/)) {
+        return error("id param is invalid");
+      }
+      req.session.snapscale = {
+        profile_id: id,
+        accessToken: req.query.snapscale_csv_url,
+        refreshToken: null,
+      };
+      return redirect();
+    }
+  );
+
 }
 
 var app = express();
