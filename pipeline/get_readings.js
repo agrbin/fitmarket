@@ -5,7 +5,8 @@ var
   FitbitApiClient = require("fitbit-node"),
   google = require('googleapis'),
   moment = require("moment"),
-  async = require("async");
+  async = require("async"),
+  request = require("request");
 
 var fitbitClient = new FitbitApiClient(
     config.fitbit.clientID,
@@ -173,11 +174,69 @@ function getFitbitReadings(date_from_str, done) {
   ], done);
 }
 
+// date_from_str is latest measurement for this stream, or now() - 2 years.
+// in this function 'date_from_str' is ignored. we always return everything
+// here.
+function getSnapscaleReadings(date_from_str, done) {
+  var stream = this;
+  // get and parse stream.access_token url.
+  // aggregatedReadings is array of pairs:
+  //  [date_str, float roundValue'ed minimum raeding for that date]
+  //  looks like it's ok if we just output everything every time.
+
+  request(stream.access_token, function (error, response, body) {
+    if (error) {
+      return done(error);
+    }
+    if (!response || response.statusCode != 200) {
+      return done("unexpected status code: " + response.statusCode);
+    }
+    var rows = body.split("\n");
+    var header = rows.shift();
+    var kHeader = "unix_timestamp_s,local_datetime,local_timezone,weight,weight_unit";
+    if (header != kHeader) {
+      return done("unexpected csv header: " + header);
+    }
+
+    var readings = {};
+    rows.forEach(function (row, index) {
+      var items = row.split(",");
+      if (items.length !== 5) {
+        return false;
+      }
+      var datetime = items[1];
+      var datestr = datetime.split(" ")[0];
+      var weight = items[3];
+      var metric = items[4];
+      if (metric !== "kg") {
+        return false;
+      }
+      if (!readings.hasOwnProperty(datestr)) {
+        readings[datestr] = []
+      }
+      readings[datestr].push(roundValue(weight));
+    });
+
+    var aggregatedReadings = [];
+    for (var date_str in readings) {
+      aggregatedReadings.push(
+          [date_str, getMin(readings[date_str])]);
+    }
+    done(null, date_from_str, aggregatedReadings);
+  });
+}
+
 // Takes a stream_credentials row, downloads the stream data from fitbit and
 // writes it into the database.
 function saveStreamData(stream, done) {
   console.log("Processing stream " + stream.stream_name + " provider: " +
       stream.provider);
+
+  var providerHandlers = {
+    "fitbit" : getFitbitReadings.bind(stream),
+    "googlefit" : getGoogleFitReadings.bind(stream),
+    "snapscale" : getSnapscaleReadings.bind(stream),
+  };
 
   async.waterfall([
     // Read the latest reading from the database.
@@ -185,9 +244,7 @@ function saveStreamData(stream, done) {
       db.getLatestMeasurement(stream.stream_id, done);
     },
     // Get the readings from service
-    (stream.provider == "fitbit" ?
-      getFitbitReadings.bind(stream) :
-      getGoogleFitReadings.bind(stream)),
+    providerHandlers[stream.provider],
     // Write readings into the database.
     function (date_from_str, readings_arr, done) {
       var fallback = moment().subtract(2 * 365, "days").format("YYYY-MM-DD");

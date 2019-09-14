@@ -83,11 +83,18 @@ function forFitbit(stream, done) {
   });
 };
 
+function forSnapscale(stream, done) {
+  console.log("  SnapScale doesn't refresh tokens..");
+  done(null, stream);
+}
+
 function refreshTokens(stream, done) {
   if (stream.provider == 'fitbit') {
     forFitbit(stream, done);
   } else if (stream.provider == 'googlefit') {
     forGoogleFit(stream, done);
+  } else if (stream.provider == 'snapscale') {
+    forSnapscale(stream, done);
   } else {
     logAndSwallowError(stream, "  unknown provider: " + stream.provider, done);
   }
