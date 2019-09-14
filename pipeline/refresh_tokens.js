@@ -84,7 +84,7 @@ function forFitbit(stream, done) {
 };
 
 function forSnapscale(stream, done) {
-  console.log("  SnapScale doesn't refresh tokens..");
+  console.log("  SnapScale doesn't refresh tokens for ", stream.stream_name);
   done(null, stream);
 }
 
