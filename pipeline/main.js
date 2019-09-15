@@ -43,21 +43,23 @@ function executeStepsInTransaction(steps) {
   );
 }
 
-refresh_tokens.refreshTokens(function (err, valid_streams) {
-  if (err) {
-    console.log("internal refresh token error: ", err,
-                "; stopping the pipeline.");
-    return;
-  }
-  executeStepsInTransaction([
-    function (done) {
-      get_readings.getReadings(valid_streams, done);
-    },
-    update_plot.updatePlot,
-    update_latest.updateLatest,
-    update_total_money.updateTotalMoney,
-    update_plot.updateTotalMoneyPlot,
-    update_stats.updateStats,
-    update_opportunity.updateOpportunity,
-  ]);
-});
+function getStreamData(done) {
+  refresh_tokens.refreshTokens(function (err, valid_streams) {
+    if (err) {
+      console.log("internal refresh token error: ", err,
+                  "; stopping the pipeline.");
+      return done(err);
+    }
+    get_readings.getReadings(valid_streams, done);
+  });
+}
+
+executeStepsInTransaction([
+  getStreamData,
+  update_plot.updatePlot,
+  update_latest.updateLatest,
+  update_total_money.updateTotalMoney,
+  update_plot.updateTotalMoneyPlot,
+  update_stats.updateStats,
+  update_opportunity.updateOpportunity,
+]);
