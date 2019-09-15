@@ -92,7 +92,8 @@ function buildStats(period_id, stream_id, first_date, stream_name, data) {
   data = data.filter(function (row) {
     return row.date >= first_date && row.date <= today_date;
   });
-  var n_days = moment(today_date).diff(moment(first_date), "days");
+  // This is 1 +, because we have inclusive interval [t - 7, t].
+  var n_days = 1 + moment(today_date).diff(moment(first_date), "days");
   // sort data ascending
   data.sort(function (lhs, rhs) {
     return lhs.date.localeCompare(rhs.date);
