@@ -66,7 +66,9 @@ function getStats(data, first_date, n_days) {
   }
   values.sort();
   if (regression_values.length >= 2) {
-    var reg = regression.linear(regression_values);
+    var reg = regression.linear(regression_values, {
+      precision: 3,
+    });
     result.trend_kg_per_day = reg.equation[0];
     result.trend_yintercept = reg.equation[1];
   }
