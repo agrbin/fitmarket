@@ -61,6 +61,9 @@ function getStats(data, first_date, n_days) {
       result.max = weight;
     }
   });
+  if (values.length > 0) {
+    result.latest_weight = values[values.length - 1];
+  }
   values.sort();
   if (regression_values.length >= 2) {
     var reg = regression.linear(regression_values);
@@ -69,7 +72,6 @@ function getStats(data, first_date, n_days) {
   }
   if (values.length > 0) {
     result.median = values[(values.length / 2) | 0];
-    result.latest_weight = values[values.length - 1];
     result.availability_ratio = 1.0 * values.length / n_days;
     result.range = Math.round((result.max - result.min) * 10) / 10.0;
     result.volatility_ratio = result.range / result.median;
