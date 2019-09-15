@@ -4,6 +4,7 @@ var express = require("express"),
   moment = require("moment"),
   fast_market = require("./fast_market.js"),
   db = new (require("../common/db.js").Db)(),
+  fs = require("fs"),
   TopTraders = require("./top_traders.js").TopTraders;
 
 var topTraders = new TopTraders(db);
@@ -11,10 +12,12 @@ var topTraders = new TopTraders(db);
 function parseUiDefaults(ui_defaults_str) {
   var defaults = {
     "section_plot_visible" : "yes",
+    "section_stats_visible" : "yes",
     "section_toptraders_visible" : "yes",
     "section_topabstraders_visible" : "yes",
     "section_fastmarket_visible" : "yes",
     "initial_plot_btn" : "1w",
+    "initial_stats_btn" : "1w",
     "initial_toplist_btn" : "3d",
   }
   var result = {};
@@ -46,6 +49,7 @@ function render(page, req, res) {
     fast_market_compatible : fast_market_bids !== false,
     fast_market_bids : fast_market_bids,
     top_traders : res.js_payload.top_traders,
+    stats : JSON.parse(fs.readFileSync(config.stats_json_txt)),
     session : JSON.stringify(req.session),
     actual : req.actual,
     ui_defaults : parseUiDefaults(req.user.ui_defaults),

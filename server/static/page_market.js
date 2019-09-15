@@ -123,6 +123,18 @@ $(function () {
 
     var initial_text = $(".plot-btn.time-span-buttons").data("initial");
     activate.call($(".plot-btn.time-span-buttons a.d" + initial_text), "ignore_update");
+
+    function initStreamTableColors() {
+      for (var i = 0; i < plot.getLabels().length; ++i) {
+        var name = plot.getLabels()[i];
+        var prop = plot.getPropertiesForSeries(name);
+        if (name == "date") {
+          continue;
+        }
+        $(".tdstream" + name).css("color", prop.color);
+      }
+    }
+    initStreamTableColors();
   }
 
   // toplist period navigation
@@ -141,6 +153,24 @@ $(function () {
   $(".toplist-btn.time-span-buttons a").click(activateToplist);
   var initial_text = $(".toplist-btn.time-span-buttons").data("initial");
   activateToplist.call($(".toplist-btn.time-span-buttons a.d" + initial_text), "ignore_update");
+
+  // stats period nevigation
+  function activateStats(arg) {
+    $(".stats-btn.time-span-buttons a").removeClass("ui-btn-active");
+    $(this).addClass("ui-btn-active");
+    $(this).blur();
+    var span_str = $(this).text().trim();
+    $(".stats-div").hide();
+    $(".stats-div." + span_str).show();
+    if (arg != "ignore_update") {
+      updateDefaultUIs("initial_stats_btn", span_str);
+    }
+  }
+
+  $(".stats-btn.time-span-buttons a").click(activateStats);
+  var initial_text = $(".stats-btn.time-span-buttons").data("initial");
+  activateStats.call($(".stats-btn.time-span-buttons a.d" + initial_text), "ignore_update");
+
 });
 
 var update_default_uis_throttle_timer = null;

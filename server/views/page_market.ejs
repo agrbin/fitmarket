@@ -33,6 +33,127 @@
     </div>
   </div>
 
+  <!-- stats -->
+  <div class="ui-corner-all">
+    <div class="ui-bar ui-bar-a">
+      <h3
+        data-visible="<%= ui_defaults.section_stats_visible %>"
+        data-name="section_stats_visible"
+      >
+        Tablica dionica
+      </h3>
+      <span class="stats-btn time-span-buttons"
+        data-initial="<%= ui_defaults.initial_stats_btn %>"
+      >
+        <% for (var periodId in stats) { %>
+          <a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-mini d<%= periodId %>">
+            <%= periodId %>
+          </a>
+        <% } %>
+      </span>
+    </div>
+
+    <div class="section-wrapper">
+    <% for (var periodId in stats) { %>
+    <div class="ui-body ui-body-a stats stats-div <%= periodId %>">
+      <table
+        data-role="table"
+        class="table-stroke ui-responsive"
+        data-mode="columntoggle"
+        id="details">
+        <thead>
+          <tr>
+            <th data-priority="1">Dionica</th>
+
+            <th
+              data-priority="5"
+              title="Omjer dana u kojem dionica ima vrijednost u periodu">
+              Učestalost mjerenja
+            </th>
+
+            <th
+              data-priority="3"
+              title="Vrijednost dionice na početku perioda">
+              Početna vrijednost</td>
+
+            <th
+              data-priority="2"
+              title="Završna - početna vrijednost">
+              Promjena</td>
+
+            <th
+              data-priority="1"
+              title="Vrijednost dionice na kraju perioda i relativni rast">
+              Završna vrijednost</td>
+
+            <th
+              data-priority="1"
+              title="Završna / početna vrijednost, postotak">
+              %</td>
+
+            <th
+              data-priority="4"
+              title="Medijan vrijednosti dionice u periodu">
+              Medijan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (var i = 0; i < stats[periodId].length; ++i) { %>
+          <tr>
+            <td class="tdstream tdstream<%= stats[periodId][i].stream_name %>">
+              <%= stats[periodId][i].stream_name %>
+            </td>
+            <td>
+              <span class="ratio
+                  <%= formatClass(stats[periodId][i].availability_ratio) %>
+              ">
+              <%= formatRatio(stats[periodId][i].availability_ratio) %>
+              </span>
+            </td>
+            <td>
+              <% if (stats[periodId][i].first_weight) { %>
+              <span class="value">
+                <%= formatWeight(stats[periodId][i].first_weight) %>
+              </span>
+              <% } %>
+            </td>
+            <td>
+              <% if (stats[periodId][i].last_minus_first) { %>
+              <span class="value">
+              <%= formatChangeDelta(stats[periodId][i].last_minus_first) %>
+              </span>
+              <% } %>
+            </td>
+            <td>
+              <% if (stats[periodId][i].latest_weight) { %>
+              <span class="value">
+                <%= formatWeight(stats[periodId][i].latest_weight) %>
+              </span>
+              <% } %>
+            </td>
+            <td>
+              <% if (stats[periodId][i].rel_delta) { %>
+              <span class="change-ratio
+                <%= formatChangeClass(stats[periodId][i].rel_delta) %>
+              "><%= formatChangeRatio(stats[periodId][i].rel_delta) %></span>
+              <% } %>
+            </td>
+            <td>
+              <% if (stats[periodId][i].median) { %>
+              <span class="value">
+                <%= formatWeight(stats[periodId][i].median) %>
+              </span>
+              <% } %>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+    </div>
+  </div>
+
   <!-- top recent traders -->
   <div class="ui-corner-all">
     <div class="ui-bar ui-bar-a">
@@ -66,7 +187,7 @@
             <th data-priority="1">Trader</th>
             <th
               data-priority="3"
-              title="Vrijednost na danasnji dan - <%= periodId %>">
+              title="Vrijednost na dan (danas - <%= periodId %>)">
               Početna vrijednost</td>
             <th
               data-priority="2"

@@ -71,14 +71,6 @@ module.exports = {
   },
 
   statsIntervals : {
-    "1d": {
-      count: 1,
-      unit: "day",
-    },
-    "3d": {
-      count: 3,
-      unit: "days",
-    },
     "1w": {
       count: 1,
       unit: "week",
