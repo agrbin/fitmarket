@@ -63,8 +63,14 @@ function getStats(data, first_date, n_days) {
   });
   if (values.length > 0) {
     result.latest_weight = values[values.length - 1];
+    result.first_weight = values[0];
+    result.last_minus_first = Math.round((result.latest_weight - result.first_weight) * 10) / 10.0;
+    result.rel_delta = result.latest_weight / result.first_weight;
   }
   values.sort();
+  // Regression is quite broken! If a person only has measurements in last year
+  // on two consecutive days and values were 75kg, 76kg the trend would be
+  // 1kg/day in last year which is misleading.
   if (regression_values.length >= 2) {
     var reg = regression.linear(regression_values, {
       precision: 3,
