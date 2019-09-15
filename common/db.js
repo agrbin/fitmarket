@@ -258,7 +258,8 @@ module.exports.Db = function () {
   this.getStreamData = function (firstDate, lastDate, done) {
     db.all("SELECT date, stream_id, stream_name, weight " +
            "FROM stream_data " +
-           "WHERE date >= ? AND date <= ?;",
+           "WHERE date >= ? AND date <= ? " +
+           "ORDER BY date, stream_name;",
            firstDate,
            lastDate,
            function (err, arr) {

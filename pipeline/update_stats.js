@@ -99,7 +99,6 @@ function buildStats(period_id, stream_id, first_date, stream_name, data) {
   }, getStats(data, first_date, n_days));
 }
 module.exports.updateStats = function(done) {
-  var firstDay = getFirstDay();
   var lastDay = moment().format("YYYY-MM-DD");
   // result[ periodID ][ stream_id ] => {
   //  stream_name:
@@ -114,7 +113,9 @@ module.exports.updateStats = function(done) {
   var first_dates = getRelevantDates();
 
   async.series([
-    db.getStreamData.bind(this, firstDay, lastDay),
+    // Read everything here, to get the ordering of streams that
+    // is same as in plot.
+    db.getStreamData.bind(this, "0000-00-00", lastDay),
   ], function (err, results) {
     if (err) {
       return done(err);
@@ -131,9 +132,11 @@ module.exports.updateStats = function(done) {
 
     var by_stream_id = {}
     var stream_name = {}
+    var ordered_stream_ids = [];
     stream_data.forEach(function (row, index) {
       if (!by_stream_id.hasOwnProperty(row.stream_id)) {
         by_stream_id[row.stream_id] = [];
+        ordered_stream_ids.push(row.stream_id);
       }
       stream_name[row.stream_id] = row.stream_name;
       by_stream_id[row.stream_id].push(row);
@@ -155,10 +158,19 @@ module.exports.updateStats = function(done) {
       }
     });
 
+    // result2 has streams ordered in each period.
+    var result2 = {}
+    for (var period_id in first_dates) {
+      result2[period_id] = []
+      ordered_stream_ids.forEach(function (stream_id) {
+        result2[period_id].push(result[period_id][stream_id]);
+      });
+    }
+
     var write_stream = fs.createWriteStream(
         config.stats_json_txt,
         {encoding : "utf8"});
-    write_stream.write(JSON.stringify(result, null, 2));
+    write_stream.write(JSON.stringify(result2, null, 2));
     write_stream.end();
     console.log(config.stats_json_txt + " updated.");
     done(null);
