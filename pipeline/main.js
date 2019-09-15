@@ -10,6 +10,7 @@ var
   update_total_money = require("./update_total_money.js"),
   refresh_tokens = require("./refresh_tokens.js"),
   update_opportunity = require("./update_opportunity.js"),
+  update_stats = require("./update_stats.js"),
   get_readings = require("./get_readings.js");
 
 function executeStepsInTransaction(steps) {
@@ -56,7 +57,7 @@ refresh_tokens.refreshTokens(function (err, valid_streams) {
     update_latest.updateLatest,
     update_total_money.updateTotalMoney,
     update_plot.updateTotalMoneyPlot,
+    update_stats.updateStats,
     update_opportunity.updateOpportunity,
   ]);
 });
-

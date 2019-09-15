@@ -31,6 +31,7 @@ module.exports = {
   },
 
   plot_txt : "../data/plot.txt",
+  stats_json_txt : "../data/stats.json.txt",
   total_money_plot_txt : "../data/total_money_plot.txt",
 
   initial_user_tmpl : {
@@ -66,6 +67,33 @@ module.exports = {
     "1m": {
       count: 1,
       unit: "month",
+    },
+  },
+
+  statsIntervals : {
+    "1d": {
+      count: 1,
+      unit: "day",
+    },
+    "3d": {
+      count: 3,
+      unit: "days",
+    },
+    "1w": {
+      count: 1,
+      unit: "week",
+    },
+    "1m": {
+      count: 1,
+      unit: "month",
+    },
+    "3m": {
+      count: 3,
+      unit: "month",
+    },
+    "1y": {
+      count: 1,
+      unit: "year",
     },
   },
 };
