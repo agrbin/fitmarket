@@ -87,6 +87,10 @@ module.exports = {
       count: 1,
       unit: "year",
     },
+    "max": {
+      count: 1,
+      unit: "raise_if_used",
+    },
   },
 };
 

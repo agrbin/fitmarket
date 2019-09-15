@@ -56,11 +56,9 @@ $(function () {
   var originalRange = null;
 
   // Stock time-range buttons.
-  function activate(arg) {
+  function activate(span_str, arg) {
     $(".plot-btn.time-span-buttons a").removeClass("ui-btn-active");
-    $(this).addClass("ui-btn-active");
-    $(this).blur();
-    var span_str = $(this).text().trim();
+    $(".plot-btn.time-span-buttons a.d" + span_str).addClass("ui-btn-active");
     var span_ms = 0;
     var now = new Date().getTime();
     switch (span_str) {
@@ -77,6 +75,7 @@ $(function () {
         span_ms = 7 * 24 * 3600 * 1000;
         break;
       default:
+        // out of all visible plots, find the widest one.
         span_ms = originalRange[1] - originalRange[0];
         break;
     }
@@ -85,6 +84,36 @@ $(function () {
     if (arg != "ignore_update") {
       updateDefaultUIs("initial_plot_btn", span_str);
     }
+  }
+
+  function onLineVisibilityUpdate() {
+    // get all lines and their visibility.
+    // if period is max, update plot time range.
+    // update stats table
+    var all_periods = [];
+    $(".stats-btn a").each(function (i, e) {
+      all_periods.push($(e).text().trim());
+    });
+    $("div#legend div").each(function (i, e) {
+      var elem = $(e);
+      var stream_name = elem.data("name");
+      var is_visible = !elem.hasClass("hide");
+
+      var correct_class = is_visible ? "enabled" : "disabled";
+      var other_class = !is_visible ? "enabled" : "disabled";
+
+      $("tr.tr" + stream_name, $("div.stats tbody." +
+          correct_class)).show();
+      $("tr.tr" + stream_name, $("div.stats tbody." +
+          other_class)).hide();
+    });
+  }
+
+  function streamNameClick(elem) {
+    var id = elem.data("id");
+    elem.toggleClass("hide");
+    plot.setVisibility(id, !elem.hasClass("hide"));
+    onLineVisibilityUpdate();
   }
 
   function setUpZoomButtons() {
@@ -102,6 +131,7 @@ $(function () {
           .css("color", prop.color)
           .data("id", plot.indexFromSetName(name) - 1)
           .data("name", name)
+          .addClass("stream_name_" + name)
           .attr('unselectable', 'on')
           .css('user-select', 'none')
           .on('selectstart', false)
@@ -109,32 +139,27 @@ $(function () {
         // hack: change colors in fastmarket container
         $(".fastmarket-container #stock-" + name)
           .css("color", prop.color);
+        $(".tdstream" + name).css("color", prop.color);
       }
     }
     // get all series, colors and ids.
     $("div#legend div").click(function (e) {
       e.preventDefault();
-      var id = $(this).data("id");
-      $(this).toggleClass("hide");
-      plot.setVisibility(id, !$(this).hasClass("hide"));
+      streamNameClick($(this));
     });
     originalRange = plot.xAxisRange();
-    $(".plot-btn.time-span-buttons a").click(activate);
 
-    var initial_text = $(".plot-btn.time-span-buttons").data("initial");
-    activate.call($(".plot-btn.time-span-buttons a.d" + initial_text), "ignore_update");
+    $(".plot-btn.time-span-buttons a").click(function () {
+      $(this).blur();
+      activate($(this).text().trim());
+      activateStats($(this).text().trim());
+    });
 
-    function initStreamTableColors() {
-      for (var i = 0; i < plot.getLabels().length; ++i) {
-        var name = plot.getLabels()[i];
-        var prop = plot.getPropertiesForSeries(name);
-        if (name == "date") {
-          continue;
-        }
-        $(".tdstream" + name).css("color", prop.color);
-      }
-    }
-    initStreamTableColors();
+    activate(
+      $(".plot-btn.time-span-buttons").data("initial"),
+      "ignore_update"
+    );
+    onLineVisibilityUpdate();
   }
 
   // toplist period navigation
@@ -155,22 +180,29 @@ $(function () {
   activateToplist.call($(".toplist-btn.time-span-buttons a.d" + initial_text), "ignore_update");
 
   // stats period nevigation
-  function activateStats(arg) {
+  function activateStats(span_str) {
     $(".stats-btn.time-span-buttons a").removeClass("ui-btn-active");
-    $(this).addClass("ui-btn-active");
-    $(this).blur();
-    var span_str = $(this).text().trim();
+    $(".stats-btn.time-span-buttons a.d" + span_str).addClass("ui-btn-active");
     $(".stats-div").hide();
     $(".stats-div." + span_str).show();
-    if (arg != "ignore_update") {
-      updateDefaultUIs("initial_stats_btn", span_str);
-    }
   }
 
-  $(".stats-btn.time-span-buttons a").click(activateStats);
-  var initial_text = $(".stats-btn.time-span-buttons").data("initial");
-  activateStats.call($(".stats-btn.time-span-buttons a.d" + initial_text), "ignore_update");
+  $(".stats-btn.time-span-buttons a").click(function () {
+    $(this).blur();
+    activate($(this).text().trim());
+    activateStats($(this).text().trim());
+  });
 
+  activateStats(
+    $(".plot-btn.time-span-buttons").data("initial"),
+    "ignore_update"
+  );
+
+  $("div.stats .tdstream span").click(function (e) {
+    e.preventDefault();
+    var stream_name = $(this).text();
+    streamNameClick($("div#legend div.stream_name_" + stream_name));
+  });
 });
 
 var update_default_uis_throttle_timer = null;

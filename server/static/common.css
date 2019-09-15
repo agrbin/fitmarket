@@ -11,6 +11,7 @@ span.value:after {
 
 .tdstream {
   font-weight: bold;
+  cursor: default;
 }
 
 span.parenthesis:after { content: ")"; color: gray; }
@@ -32,6 +33,13 @@ div.stats td { text-align: right; }
 div.stats th { text-align: right; }
 div.stats td:last-child { padding-right: 20px; }
 div.stats th:last-child { padding-right: 20px; }
+div.stats tbody.disabled {
+  margin-top: 20px;
+  opacity: 0.3;
+}
+div.stats tbody.gap td {
+  height: 20px;
+}
 
 div.toplist td:first-child { text-align: left; }
 div.toplist th:first-child { text-align: left; }

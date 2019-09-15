@@ -66,15 +66,15 @@
             <th data-priority="1">Dionica</th>
 
             <th
-              data-priority="5"
-              title="Omjer dana u kojem dionica ima vrijednost u periodu">
-              Učestalost mjerenja
+              data-priority="3"
+              title="Omjer dana u kojem dionica ima vrijednost u periodu (redovitost mjerenja)">
+              Redovitost
             </th>
 
             <th
               data-priority="3"
-              title="Vrijednost dionice na početku perioda">
-              Početna vrijednost</td>
+              title="Najstarija vrijednost dionice u periodu">
+              Početna</td>
 
             <th
               data-priority="2"
@@ -83,8 +83,8 @@
 
             <th
               data-priority="1"
-              title="Vrijednost dionice na kraju perioda i relativni rast">
-              Završna vrijednost</td>
+              title="Najnovija vrijednost dionice u periodu">
+              Završna</td>
 
             <th
               data-priority="1"
@@ -97,11 +97,12 @@
               Medijan</th>
           </tr>
         </thead>
-        <tbody>
+        <% for (var tbody_class in {enabled: 1, disabled:1}) { %>
+        <tbody class="<%= tbody_class %>">
           <% for (var i = 0; i < stats[periodId].length; ++i) { %>
-          <tr>
+          <tr class="tr<%= stats[periodId][i].stream_name  %>">
             <td class="tdstream tdstream<%= stats[periodId][i].stream_name %>">
-              <%= stats[periodId][i].stream_name %>
+              <span><%= stats[periodId][i].stream_name %></span>
             </td>
             <td>
               <span class="ratio
@@ -148,6 +149,10 @@
           </tr>
           <% } %>
         </tbody>
+        <% if (tbody_class === "enabled") { %>
+        <tbody class="gap"><tr><td></td></tr></tbody>
+        <% } %>
+        <% } %>
       </table>
     </div>
     <% } %>

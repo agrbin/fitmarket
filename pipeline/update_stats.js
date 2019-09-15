@@ -11,7 +11,7 @@ function getRelevantDates() {
   var intervals = config.statsIntervals;
   for (var periodId in intervals) {
     result[periodId] = {
-      first_date : moment().subtract(
+      first_date : periodId == "max" ? "0000-00-00" : moment().subtract(
         intervals[periodId].count,
         intervals[periodId].unit).format("YYYY-MM-DD")
     };
@@ -92,13 +92,16 @@ function buildStats(period_id, stream_id, first_date, stream_name, data) {
   data = data.filter(function (row) {
     return row.date >= first_date && row.date <= today_date;
   });
-  // This is 1 +, because we have inclusive interval [t - 7, t].
-  var n_days = 1 + moment(today_date).diff(moment(first_date), "days");
   // sort data ascending
   data.sort(function (lhs, rhs) {
     return lhs.date.localeCompare(rhs.date);
   });
 
+  if (period_id === "max") {
+    first_date = data[0].date;
+  }
+
+  var n_days = 1 + moment(today_date).diff(moment(first_date), "days");
   return Object.assign({
     period_id: period_id,
     n_days: n_days,
@@ -122,7 +125,7 @@ module.exports.updateStats = function(done) {
   var first_dates = getRelevantDates();
 
   async.series([
-    // Read everything here, to get the ordering of streams that
+    // Read everything to get the ordering of streams that
     // is same as in plot.
     db.getStreamData.bind(this, "0000-00-00", lastDay),
   ], function (err, results) {
