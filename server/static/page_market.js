@@ -97,6 +97,9 @@ $(function () {
     $("div#legend div").each(function (i, e) {
       var elem = $(e);
       var stream_name = elem.data("name");
+      if (stream_name === "__all__") {
+        return;
+      }
       var is_visible = !elem.hasClass("hide");
 
       var correct_class = is_visible ? "enabled" : "disabled";
@@ -111,8 +114,26 @@ $(function () {
 
   function streamNameClick(elem) {
     var id = elem.data("id");
-    elem.toggleClass("hide");
-    plot.setVisibility(id, !elem.hasClass("hide"));
+    if (id === "__all__") {
+      var is_on = !elem.hasClass("hide");
+      $("div#legend div").each(function (i, e) {
+        var stream_elem = $(e);
+        var stream_id = stream_elem.data("id");
+        if (stream_id === "__all__") {
+          return;
+        }
+        if (is_on) {
+          stream_elem.addClass("hide");
+        } else {
+          stream_elem.removeClass("hide");
+        }
+        plot.setVisibility(stream_id, !stream_elem.hasClass("hide"));
+      });
+      elem.toggleClass("hide");
+    } else {
+      elem.toggleClass("hide");
+      plot.setVisibility(id, !elem.hasClass("hide"));
+    }
     onLineVisibilityUpdate();
   }
 
@@ -142,6 +163,15 @@ $(function () {
         $(".tdstream" + name).css("color", prop.color);
       }
     }
+    $("<div></div>")
+      .css("color", "black")
+      .data("id", "__all__")
+      .data("name", "__all__")
+      .addClass("__all__")
+      .attr('unselectable', 'on')
+      .css('user-select', 'none')
+      .on('selectstart', false)
+      .text("SVE").appendTo($("div#legend"));
     // get all series, colors and ids.
     $("div#legend div").click(function (e) {
       e.preventDefault();

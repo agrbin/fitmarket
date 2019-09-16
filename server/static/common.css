@@ -14,6 +14,12 @@ span.value:after {
   cursor: default;
 }
 
+div.__all__ {
+  border: 1px #ccc solid;
+  padding: 0px 5px;
+  border-radius: 3px;
+}
+
 span.parenthesis:after { content: ")"; color: gray; }
 span.parenthesis:before { content: "("; color: gray; }
 
@@ -39,6 +45,7 @@ div.stats tbody.disabled {
 }
 div.stats tbody.gap td {
   height: 20px;
+  border: 0px;
 }
 
 div.toplist td:first-child { text-align: left; }
