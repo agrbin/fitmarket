@@ -3,12 +3,16 @@ var
   db = new (require("../common/db.js").Db)(),
   async = require("async");
 
+function roundValue(x) {
+  return Math.round(x * 10) / 10;
+}
+
 // this function returns {
 //  user_id:
 //  total_money:
 // }
 function calculateNewAssets(userAsset, actual) {
-  var total_money = userAsset.free_money;
+  var total_money = roundValue(userAsset.free_money);
   var shares = JSON.parse(userAsset.shares);
   for (var stream_id in shares) {
     if (!actual.hasOwnProperty(stream_id)) {
@@ -17,11 +21,11 @@ function calculateNewAssets(userAsset, actual) {
     }
     var latest = actual[stream_id].latest_weight;
     var count = shares[stream_id];
-    total_money += latest * count;
+    total_money += roundValue(latest * count);
   } 
   return {
     user_id: userAsset.user_id,
-    total_money: total_money,
+    total_money: roundValue(total_money),
   };
 }
 

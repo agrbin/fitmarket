@@ -34,6 +34,10 @@ function getFirstDay() {
   return min;
 }
 
+function roundValue(x) {
+  return Math.round(x * 10) / 10;
+}
+
 module.exports.updateOpportunity = function(done) {
   var firstDay = getFirstDay();
   var lastDay = moment().format("YYYY-MM-DD");
@@ -66,7 +70,7 @@ module.exports.updateOpportunity = function(done) {
       if (!total_money_by_date.hasOwnProperty(log.date)) {
         total_money_by_date[log.date] = {};
       }
-      total_money_by_date[log.date][log.user_id] = log.total_money;
+      total_money_by_date[log.date][log.user_id] = roundValue(log.total_money);
       user_ids[log.user_id] = true;
     }
 
