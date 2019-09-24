@@ -6,6 +6,7 @@ var
   google = require('googleapis'),
   moment = require("moment"),
   async = require("async"),
+  retry = require("retry"),
   request = require("request");
 
 var fitbitClient = new FitbitApiClient(
@@ -35,8 +36,7 @@ function getMin(arr) {
 }
 
 // stream is passed through this
-function getGoogleFitReadings(date_from_str, done) {
-  var stream = this;
+function getGoogleFitReadings(stream, date_from_str, done) {
 
   // Converts 1 point in dataset to time/weight pair.
   function getPointInfo(point) {
@@ -101,8 +101,7 @@ function getGoogleFitReadings(date_from_str, done) {
 }
 
 // stream is passed through this
-function getFitbitReadings(date_from_str, done) {
-  var stream = this;
+function getFitbitReadings(stream, date_from_str, done) {
 
   function getWeightsForDateRange(date_range, done) {
     fitbitClient.get(
@@ -177,8 +176,7 @@ function getFitbitReadings(date_from_str, done) {
 // date_from_str is latest measurement for this stream, or now() - 2 years.
 // in this function 'date_from_str' is ignored. we always return everything
 // here.
-function getSnapscaleReadings(date_from_str, done) {
-  var stream = this;
+function getSnapscaleReadings(stream, date_from_str, done) {
   // get and parse stream.access_token url.
   // aggregatedReadings is array of pairs:
   //  [date_str, float roundValue'ed minimum raeding for that date]
@@ -226,6 +224,26 @@ function getSnapscaleReadings(date_from_str, done) {
   });
 }
 
+function wrapRetry(func) {
+  return (function (stream, date_from_str, done) {
+    var operation = retry.operation({
+        retries: 3,
+    });
+    operation.attempt(function (currentAttempt) {
+      func(stream, date_from_str, function (err, date_from_str, aggregatedReadings) {
+        if (err) {
+          console.log(err);
+          console.log("get reading error " + currentAttempt + ", maybe retrying..");
+        }
+        if (operation.retry(err)) {
+          return;
+        }
+        done(err ? operation.mainError() : null, date_from_str, aggregatedReadings);
+      });
+    });
+  });
+}
+
 // Takes a stream_credentials row, downloads the stream data from fitbit and
 // writes it into the database.
 function saveStreamData(stream, done) {
@@ -233,15 +251,20 @@ function saveStreamData(stream, done) {
       stream.provider);
 
   var providerHandlers = {
-    "fitbit" : getFitbitReadings.bind(stream),
-    "googlefit" : getGoogleFitReadings.bind(stream),
-    "snapscale" : getSnapscaleReadings.bind(stream),
+    "fitbit" : wrapRetry(getFitbitReadings),
+    "googlefit" : wrapRetry(getGoogleFitReadings),
+    "snapscale" : wrapRetry(getSnapscaleReadings),
   };
 
   async.waterfall([
     // Read the latest reading from the database.
     function (done) {
-      db.getLatestMeasurement(stream.stream_id, done);
+      db.getLatestMeasurement(stream.stream_id, function (err, latest_date_str) {
+        if (err) {
+          return done(err);
+        }
+        done(null, stream, latest_date_str);
+      });
     },
     // Get the readings from service
     providerHandlers[stream.provider],
@@ -294,5 +317,13 @@ function saveStreamData(stream, done) {
 // gets list of valid streams.
 module.exports.getReadings = function (stream_credentials, done) {
   console.log("\nNeeds to process " + stream_credentials.length + " streams.");
-  async.eachSeries(stream_credentials, saveStreamData, done);
+  async.eachSeries(stream_credentials, function (stream, inner_done) {
+    saveStreamData(stream, function (err) {
+      if (err) {
+        console.log("unrecoverable error while saving stream: ", stream.stream_name);
+        console.log(err);
+      }
+      inner_done();
+    });
+  }, done);
 };
