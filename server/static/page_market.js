@@ -66,7 +66,7 @@ $(function () {
         span_ms = 365 * 24 * 3600 * 1000;
         break;
       case "3m":
-        span_ms = 30 * 2 * 24 * 3600 * 1000;
+        span_ms = 30 * 3 * 24 * 3600 * 1000;
         break;
       case "1m":
         span_ms = 30 * 24 * 3600 * 1000;
