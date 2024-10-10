@@ -3,8 +3,6 @@ var express = require("express"),
   session = require("express-session"),
   sha1 = require('sha1'),
   bodyParser = require("body-parser"),
-  FitbitStrategy =
-    require("passport-fitbit-oauth2").FitbitOAuth2Strategy,
   GoogleStrategy =
     require("passport-google-oauth20").Strategy,
   ensureLoggedIn = require("connect-ensure-login").ensureLoggedIn,
@@ -20,30 +18,6 @@ function clone(x) {
 }
 
 function setUpAuth() {
-  // fitbit
-  passport.use(new FitbitStrategy(
-    config.fitbit,
-    function(accessToken, refreshToken, profile, done) {
-      done(null, {
-        profile_id: profile.id,
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      });
-    }
-  ));
-
-  // googlefit
-  passport.use('googlefit', new GoogleStrategy(
-    config.googleFit,
-    function(accessToken, refreshToken, profile, done) {
-      done(null, {
-        profile_id: profile.id,
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      });
-    }
-  ));
-
   // google
   passport.use('google', new GoogleStrategy(
     config.google,
@@ -81,37 +55,6 @@ function setUpAuth() {
       // the domain changes from fm.xfer.hr to fitmarket.xfer.hr. I changed the
       // front web server now to resolve this on its own and to send request to
       // node app only on full domains (fitmarket and fitmarket.sandbox).
-      res.redirect(req.session.returnTo || "/main");
-    }
-  );
-
-  // googlefit
-  app.get("/googlefit/init",
-    passport.authenticate("googlefit", {
-    scope: [
-      "https://www.googleapis.com/auth/userinfo.email",
-      "https://www.googleapis.com/auth/fitness.body.read"
-    ],
-    accessType: "offline",
-    prompt: "consent",
-  }));
-
-  app.get("/googlefit/callback",
-    passport.authenticate("googlefit", {failureRedirect: "/"}),
-    function (req, res) {
-      req.session.googlefit = clone(req.session.passport.user);
-      res.redirect(req.session.returnTo || "/main");
-    }
-  );
-
-  // fitbit
-  app.get("/fitbit/init",
-    passport.authenticate("fitbit", {scope: ["profile", "weight"]}));
-
-  app.get("/fitbit/callback",
-    passport.authenticate("fitbit", {failureRedirect: "/"}),
-    function (req, res) {
-      req.session.fitbit = clone(req.session.passport.user);
       res.redirect(req.session.returnTo || "/main");
     }
   );
